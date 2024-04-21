@@ -21,6 +21,9 @@ class VisualizerUI(tk.Tk):
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
+        for i in range(2):
+            page = tk.Frame(notebook, width=400, height=400)
+            notebook.add(page, text=names[i+1])
         # for i in range(3):
         #     page = tk.Frame(notebook, width=400, height=400)
         #     page.pack(fill='both', expand=True)
