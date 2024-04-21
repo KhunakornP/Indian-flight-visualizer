@@ -1,6 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, font
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
+import seaborn as sns
+import pandas as pd
 
+
+
+df = pd.read_csv("Indian Airlines.csv")
 
 class VisualizerUI(tk.Tk):
     def __init__(self):
@@ -36,7 +46,7 @@ class VisualizerUI(tk.Tk):
         frame3 = tk.Frame(mainframe)
         text_sum = tk.Label(frame3, text="Price analysis", anchor=tk.N)
         text_sum.pack(expand=True, fill='both')
-        placeholder = tk.Text(frame2)
+        placeholder = GraphManager(frame2, df)
         placeholder.pack(expand=True, fill="both")
         from_label = tk.Label(frame1, text="From:")
         from_combo = ttk.Combobox(frame1, textvariable=self.from_city)
@@ -59,6 +69,22 @@ class VisualizerUI(tk.Tk):
 
     def run(self):
         self.mainloop()
+
+
+class GraphManager(tk.Frame):
+    def __init__(self, parent, df):
+        super().__init__(parent)
+        self.df = df
+        self.draw()
+
+    def draw(self):
+        # fig = Figure()
+        # ax = fig.add_subplot()
+        fig, ax = plt.subplots(figsize=(6,6), dpi=100)
+        sns.histplot(df, x="price")
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 if __name__ == "__main__":
     f = VisualizerUI()
