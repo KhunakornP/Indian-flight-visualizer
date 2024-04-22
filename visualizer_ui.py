@@ -1,18 +1,19 @@
 import tkinter as tk
 from tkinter import ttk, font
 import matplotlib
-matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
+matplotlib.use("TkAgg")
 
 
-
+# for testing
 df = pd.read_csv("Indian Airlines.csv")
 
+
 class VisualizerUI(tk.Tk):
+    """UI class for the visualizer"""
     def __init__(self):
         super().__init__()
         self.title("Indian flight visualizer")
@@ -20,7 +21,7 @@ class VisualizerUI(tk.Tk):
         self.to_city = tk.StringVar()
         self.flight = tk.StringVar()
         self.default_font = font.nametofont("TkDefaultFont")
-        self.default_font.configure(family="Times", size=15)
+        self.default_font.configure(family="Times", size=22)
         self.init_notebook()
 
     def init_components(self):
@@ -49,11 +50,11 @@ class VisualizerUI(tk.Tk):
         placeholder = GraphManager(frame2, df)
         placeholder.pack(expand=True, fill="both")
         from_label = tk.Label(frame1, text="From:")
-        from_combo = ttk.Combobox(frame1, textvariable=self.from_city)
+        from_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.from_city)
         to_label = tk.Label(frame1, text="To:")
-        to_combo = ttk.Combobox(frame1, textvariable=self.to_city)
+        to_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.to_city)
         flight_label = tk.Label(frame1, text="Flight:")
-        flight_combo = ttk.Combobox(frame1, textvariable=self.flight)
+        flight_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.flight)
         settings = {"padx":10, "pady":5, "anchor":tk.W,"expand":True, "fill":"y"}
         from_label.pack(**settings)
         from_combo.pack(**settings)
@@ -72,19 +73,22 @@ class VisualizerUI(tk.Tk):
 
 
 class GraphManager(tk.Frame):
+    """A class for managing graphs"""
     def __init__(self, parent, df):
         super().__init__(parent)
         self.df = df
         self.draw()
 
     def draw(self):
-        # fig = Figure()
-        # ax = fig.add_subplot()
         fig, ax = plt.subplots(figsize=(6,6), dpi=100)
         sns.histplot(df, x="price")
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+    def update_graph(self, x,y):
+        """Updates the graph"""
+        pass
 
 if __name__ == "__main__":
     f = VisualizerUI()
