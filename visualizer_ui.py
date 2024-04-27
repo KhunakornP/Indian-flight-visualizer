@@ -27,9 +27,11 @@ class VisualizerUI(tk.Tk):
         self.init_notebook()
 
     def init_components(self):
+        """Initializes the ui components"""
         pass
 
     def init_menu(self):
+        """Initialize the top menu of the ui"""
         menu_font = self.default_font
         menu_font.configure(size=18)
         menu_bar = tk.Menu(self)
@@ -40,6 +42,7 @@ class VisualizerUI(tk.Tk):
         self.configure(menu=menu_bar)
 
     def init_notebook(self):
+        """Initializes the notebook"""
         notebook = ttk.Notebook(self)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
@@ -53,6 +56,7 @@ class VisualizerUI(tk.Tk):
         #     notebook.add(page, text=names[i])
 
     def init_flight_search(self):
+        """Initializes the flight search page"""
         mainframe = tk.Frame(self)
         frame1 = tk.Frame(mainframe)
         frame2 = tk.Frame(mainframe)
@@ -81,9 +85,11 @@ class VisualizerUI(tk.Tk):
         return mainframe
 
     def init_flight_planner(self):
+        """Initializes the flight planner page"""
         pass
 
     def init_data_summary(self):
+        """Initializes the data summary page"""
         mainframe = tk.Frame(self)
         frame1 = tk.Frame(mainframe)
         placeholder = GraphManager(mainframe, df)
@@ -106,6 +112,7 @@ class VisualizerUI(tk.Tk):
         return mainframe
 
     def run(self):
+        """Runs the app"""
         self.mainloop()
 
 
@@ -117,6 +124,7 @@ class GraphManager(tk.Frame):
         self.draw()
 
     def draw(self):
+        """Draw the graph from the dataframe"""
         fig, ax = plt.subplots(figsize=(6,6), dpi=100)
         sns.histplot(df, x="price")
         canvas = FigureCanvasTkAgg(fig, self)
