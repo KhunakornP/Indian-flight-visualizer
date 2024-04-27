@@ -20,21 +20,33 @@ class VisualizerUI(tk.Tk):
         self.from_city = tk.StringVar()
         self.to_city = tk.StringVar()
         self.flight = tk.StringVar()
+        self.cur_graph = tk.StringVar()
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
+        self.init_menu()
         self.init_notebook()
 
     def init_components(self):
         pass
+
+    def init_menu(self):
+        menu_font = self.default_font
+        menu_font.configure(size=18)
+        menu_bar = tk.Menu(self)
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.quit, font=menu_font)
+        menu_bar.add_cascade(label="File", menu=file_menu, font=menu_font)
+        self.configure(menu=menu_bar)
 
     def init_notebook(self):
         notebook = ttk.Notebook(self)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
-        for i in range(2):
-            page = tk.Frame(notebook, width=400, height=400)
-            notebook.add(page, text=names[i+1])
+        page = tk.Frame(notebook, width=400, height=400)
+        notebook.add(page, text=names[1])
+        notebook.add(self.init_data_summary(), text=names[2])
         # for i in range(3):
         #     page = tk.Frame(notebook, width=400, height=400)
         #     page.pack(fill='both', expand=True)
@@ -66,6 +78,31 @@ class VisualizerUI(tk.Tk):
         frame2.pack(fill="both", expand=True, side=tk.LEFT)
         frame3.pack(fill="both", expand=True, side=tk.RIGHT)
         mainframe.pack(fill='both', expand=True)
+        return mainframe
+
+    def init_flight_planner(self):
+        pass
+
+    def init_data_summary(self):
+        mainframe = tk.Frame(self)
+        frame1 = tk.Frame(mainframe)
+        placeholder = GraphManager(mainframe, df)
+        frame2 = tk.Frame(mainframe)
+        graph_label = tk.Label(frame1, text="Graph selector:")
+        graph_select = ttk.Combobox(frame1,font=self.default_font,
+                                    textvariable=self.cur_graph)
+        sum_label = tk.Label(frame2, text="Exploration:")
+        sum_text = tk.Text(frame2)
+        settings = {"padx": 10, "pady": 5, "expand": True,
+                    "fill": "both"}
+        graph_label.pack(**settings)
+        graph_select.pack(**settings)
+        sum_label.pack(**settings)
+        sum_text.pack(**settings)
+        frame1.pack(fill="both", expand=True, side=tk.LEFT)
+        placeholder.pack(fill="both", expand=True, side=tk.LEFT)
+        frame2.pack(fill="both", expand=True, side=tk.RIGHT)
+        mainframe.pack(fill="both", expand=True)
         return mainframe
 
     def run(self):
