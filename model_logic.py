@@ -31,9 +31,28 @@ class DataframeLogic:
     def update_graph(self):
         pass
 
+    def get_airport_names(self):
+        """
+        Gets all available airport names in the dataframe
+
+        :return: A list of airport names in the dataframe
+        """
+        cities = self.orig_df.source_city.unique()
+        return cities
+
+    def get_flight_codes(self):
+        """
+        Gets all available flights from the current dataframe
+
+        :return: A list of flight codes from the current dataframe
+        """
+        return self.cur_df.flight
+
 
 if __name__ == "__main__":
     test = DataframeLogic()
     test.pair_city("Delhi", "Mumbai")
     print(test.cur_df.head().source_city)
     print(test.cur_df.head().destination_city)
+    print(test.get_airport_names())
+    print(test.get_flight_codes())
