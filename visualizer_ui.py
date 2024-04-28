@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
+from keypad import Keypad
 matplotlib.use("TkAgg")
 
 
@@ -43,17 +44,12 @@ class VisualizerUI(tk.Tk):
 
     def init_notebook(self):
         """Initializes the notebook"""
-        notebook = ttk.Notebook(self)
+        notebook = ttk.Notebook(self,width=1200, height=600)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
-        page = tk.Frame(notebook, width=400, height=400)
-        notebook.add(page, text=names[1])
+        notebook.add(self.init_flight_planner(), text=names[1])
         notebook.add(self.init_data_summary(), text=names[2])
-        # for i in range(3):
-        #     page = tk.Frame(notebook, width=400, height=400)
-        #     page.pack(fill='both', expand=True)
-        #     notebook.add(page, text=names[i])
 
     def init_flight_search(self):
         """Initializes the flight search page"""
@@ -66,12 +62,16 @@ class VisualizerUI(tk.Tk):
         placeholder = GraphManager(frame2, df)
         placeholder.pack(expand=True, fill="both")
         from_label = tk.Label(frame1, text="From:")
-        from_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.from_city)
+        from_combo = ttk.Combobox(frame1,font=self.default_font,
+                                  textvariable=self.from_city)
         to_label = tk.Label(frame1, text="To:")
-        to_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.to_city)
+        to_combo = ttk.Combobox(frame1,font=self.default_font,
+                                textvariable=self.to_city)
         flight_label = tk.Label(frame1, text="Flight:")
-        flight_combo = ttk.Combobox(frame1,font=self.default_font, textvariable=self.flight)
-        settings = {"padx":10, "pady":5, "anchor":tk.W,"expand":True, "fill":"y"}
+        flight_combo = ttk.Combobox(frame1,font=self.default_font,
+                                    textvariable=self.flight)
+        settings = {"padx":10, "pady":5, "anchor":tk.W,
+                    "expand":True, "fill":"y"}
         from_label.pack(**settings)
         from_combo.pack(**settings)
         to_label.pack(**settings)
@@ -86,7 +86,24 @@ class VisualizerUI(tk.Tk):
 
     def init_flight_planner(self):
         """Initializes the flight planner page"""
-        pass
+        mainframe = tk.Frame(self)
+        mode_select = Keypad(mainframe, ["Availability","Days booked",
+                                    "Frequency", "By airport", "By pair"],
+                             label="mode:")
+        type_select = Keypad(mainframe, ["Distribution", "Scatter",
+                                    "Histogram"], label="Type:")
+        graph = GraphManager(mainframe, df)
+        statistic = tk.Text(mainframe)
+        settings = {"padx": 10, "pady": 5, "expand": True,
+                    "fill": "both"}
+        statistic.pack(**settings, side=tk.BOTTOM)
+        mode_select.pack(**settings,side=tk.LEFT)
+        type_select.pack(**settings,side=tk.LEFT)
+        graph.pack(**settings,side=tk.LEFT)
+        mainframe.pack(fill="both", expand=True)
+        return mainframe
+
+
 
     def init_data_summary(self):
         """Initializes the data summary page"""
