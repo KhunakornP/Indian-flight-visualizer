@@ -60,7 +60,7 @@ class VisualizerUI(tk.Tk):
         text_sum = tk.Label(frame3, text="Price analysis", anchor=tk.N)
         text_sum.pack(expand=True, fill='both')
         placeholder = GraphManager(frame2, df)
-        placeholder.pack(expand=True, fill="both")
+        placeholder.pack(expand=True, fill="both", anchor=tk.CENTER)
         from_label = tk.Label(frame1, text="From:")
         from_combo = ttk.Combobox(frame1,font=self.default_font,
                                   textvariable=self.from_city)
@@ -87,20 +87,24 @@ class VisualizerUI(tk.Tk):
     def init_flight_planner(self):
         """Initializes the flight planner page"""
         mainframe = tk.Frame(self)
-        mode_select = Keypad(mainframe, ["Availability","Days booked",
+        frame2 = tk.Frame(mainframe)
+        mode_select = Keypad(frame2, ["Availability","Days booked",
                                     "Frequency", "By airport", "By pair"],
                              label="mode:")
-        type_select = Keypad(mainframe, ["Distribution", "Scatter",
+        type_select = Keypad(frame2, ["Distribution", "Scatter",
                                     "Histogram"], label="Type:")
         graph = GraphManager(mainframe, df)
-        statistic = tk.Text(mainframe)
+        statistic = tk.Text(frame2)
+        mainframe.pack(fill="both", expand=True)
+        mainframe.grid_columnconfigure((0,1,3), uniform="1", weight=1)
+        mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
         settings = {"padx": 10, "pady": 5, "expand": True,
                     "fill": "both"}
-        statistic.pack(**settings, side=tk.BOTTOM)
-        mode_select.pack(**settings,side=tk.LEFT)
-        type_select.pack(**settings,side=tk.LEFT)
-        graph.pack(**settings,side=tk.LEFT)
-        mainframe.pack(fill="both", expand=True)
+        mode_select.pack(**settings, side=tk.LEFT)
+        type_select.pack(**settings, side=tk.LEFT)
+        statistic.pack(**settings, side=tk.LEFT)
+        frame2.grid(row=0, column=0, sticky="ew", columnspan=2)
+        graph.grid(row=1, column=0, sticky="ew",columnspan=2, padx=10, pady=5)
         return mainframe
 
 
@@ -118,8 +122,9 @@ class VisualizerUI(tk.Tk):
         sum_text = tk.Text(frame2)
         settings = {"padx": 10, "pady": 5, "expand": True,
                     "fill": "both"}
-        graph_label.pack(**settings)
-        graph_select.pack(**settings)
+        graph_label.pack(**settings, anchor=tk.N)
+        graph_select.pack(expand=True, fill="both", pady=150, padx=10
+                          , anchor=tk.CENTER)
         sum_label.pack(**settings)
         sum_text.pack(**settings)
         frame1.pack(fill="both", expand=True, side=tk.LEFT)
