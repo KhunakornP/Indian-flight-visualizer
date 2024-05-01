@@ -1,3 +1,4 @@
+import abc
 import tkinter as tk
 from tkinter import ttk, font
 import matplotlib
@@ -107,8 +108,6 @@ class VisualizerUI(tk.Tk):
         graph.grid(row=1, column=0, sticky="ew",columnspan=2, padx=10, pady=5)
         return mainframe
 
-
-
     def init_data_summary(self):
         """Initializes the data summary page"""
         mainframe = tk.Frame(self)
@@ -138,12 +137,24 @@ class VisualizerUI(tk.Tk):
         self.mainloop()
 
 
-class GraphManager(tk.Frame):
+class Observer(abc.ABC):
+    @abc.abstractmethod
+    def update(self, logic):
+        """Receive an update from the model"""
+        raise NotImplementedError
+
+
+class GraphManager(tk.Frame, Observer):
     """A class for managing graphs"""
-    def __init__(self, parent, df):
+    def __init__(self, parent, df, type=1):
         super().__init__(parent)
         self.df = df
+        self.type = type
         self.draw()
+
+    def update(self, logic):
+        if self.type == logic.state:
+            pass
 
     def draw(self):
         """Draw the graph from the dataframe"""

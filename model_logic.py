@@ -1,10 +1,40 @@
+import abc
+from visualizer_ui import Observer
 import pandas as pd
 
 
-class DataframeLogic:
+class LogicSubject(abc.ABC):
+    @abc.abstractmethod
+    def attach(self, observer):
+        """Attach an observer to the model"""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def detach(self, observer):
+        """Detach an observer from the model"""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def notify(self):
+        """Notify graphs about changes in the data set"""
+        raise NotImplementedError
+
+
+class DataframeLogic(LogicSubject):
     def __init__(self):
+        self._observers: list[Observer] = []
         self.orig_df = pd.read_csv("Indian Airlines.csv")
         self.cur_df = self.orig_df.copy()
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def detach(self, observer):
+        self._observers.remove(observer)
+
+    def notify(self):
+        for observers in self._observers:
+            observers.update(self)
 
     def group_by(self, parameter, value):
         pass
