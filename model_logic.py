@@ -21,10 +21,11 @@ class LogicSubject(abc.ABC):
 
 
 class DataframeLogic(LogicSubject):
-    def __init__(self):
+    def __init__(self, df):
         self._observers: list[Observer] = []
-        self.orig_df = pd.read_csv("Indian Airlines.csv")
+        self.orig_df = df
         self.cur_df = self.orig_df.copy()
+        self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
         self._observers.append(observer)
@@ -52,13 +53,23 @@ class DataframeLogic(LogicSubject):
         df = df[df.destination_city == end]
         self.cur_df = df
 
-    def generate_price_analysis(self, flight_code, airline, stops, start, end):
+    def get_flight_info(self, flight_code):
+        df = self.orig_df[self.orig_df["flight"] == flight_code]
+        flight = df.iloc[0]
+        airline = flight.airline
+        stops = flight.stops
+        start = flight.arrival_time
+        end = flight.departure_time
+        return airline, stops, start, end
+
+    def generate_price_analysis(self, flight_code):
+        airline, stops, start, end = self.get_flight_info(flight_code)
         airline = self.get_airline_analysis(airline)
         stop = self.get_stop_analysis(stops)
         time = self.get_time_analysis(start, end)
-        analysis = (f"Flight {flight_code} is {'x'} baht cheaper than other "
-                    f"similar flights\nThe price of the flight is influenced "
-                    f"by the following factors:\n")
+        analysis = (f"Flight {flight_code} is {flight_code} baht cheaper than "
+                    f"other similar flights\nThe price of the flight is "
+                    f"influenced by the following factors:\n")
         analysis += f"Airline: " + airline
         analysis += f"Number of stops: " + stop
         analysis += f"Time of day: " + time
@@ -91,7 +102,19 @@ class DataframeLogic(LogicSubject):
                 f"similar flights.\n")
 
     def get_time_analysis(self, dep_time, end_time):
-        return "To be added"
+        sorted_df = self.cur_df[self.cur_df.departure_time == dep_time]
+        price_median = sorted_df.price.median()
+        time_median = sorted_df.groupby("arrival_time").price.median()
+        time_med_price = time_median[end_time]
+        if time_med_price < price_median:
+            percent = ((price_median-time_med_price)/price_median)*100
+            return (f"A flight from {dep_time} to {end_time} on average "
+                    f"decreases\nprices by {percent:.0f} percent compared to "
+                    f"similar flights.\n")
+        percent = ((time_med_price-price_median) / price_median) * 100
+        return (f"A flight from {dep_time} to {end_time} on average "
+                f"decreases\nprices by {percent:.0f} percent compared to "
+                f"similar flights.\n")
 
     def get_data_summary(self, page):
         pass
@@ -106,7 +129,7 @@ class DataframeLogic(LogicSubject):
         :return: A list of airport names in the dataframe
         """
         cities = self.orig_df.source_city.unique()
-        return cities
+        return cities.tolist()
 
     def get_flight_codes(self):
         """
@@ -114,15 +137,14 @@ class DataframeLogic(LogicSubject):
 
         :return: A list of flight codes from the current dataframe
         """
-        return self.cur_df.flight
+        return self.cur_df.flight.tolist()
 
 
 if __name__ == "__main__":
-    test = DataframeLogic()
+    test = DataframeLogic(pd.read_csv("Indian Airlines.csv"))
     test.pair_city("Delhi", "Mumbai")
     print(test.cur_df.head().source_city)
     print(test.cur_df.head().destination_city)
-    print(test.get_airport_names())
-    print(test.get_flight_codes())
     print(test.get_stop_analysis(2))
-    print(test.generate_price_analysis("A", "AirAsia", 1,"A","b"))
+    print(test.get_flight_info("SG-8709"))
+    print(test.generate_price_analysis("SG-8709"))
