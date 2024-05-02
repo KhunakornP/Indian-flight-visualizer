@@ -19,10 +19,8 @@ class VisualizerUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Indian flight visualizer")
-        self.from_city = tk.StringVar()
-        self.to_city = tk.StringVar()
-        self.flight = tk.StringVar()
-        self.cur_graph = tk.StringVar()
+        self.comboboxes = []
+        self.price_analysis = None
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
         self.init_menu()
@@ -58,19 +56,21 @@ class VisualizerUI(tk.Tk):
         frame1 = tk.Frame(mainframe)
         frame2 = tk.Frame(mainframe)
         frame3 = tk.Frame(mainframe)
-        text_sum = tk.Label(frame3, text="Price analysis", anchor=tk.N)
-        text_sum.pack(expand=True, fill='both')
+        text_label = tk.Label(frame3, text="Price analysis", anchor=tk.N)
+        text_label.pack(expand=True, fill='both')
+        self.price_analysis = tk.Text(frame3, font=self.default_font)
+        self.price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
         placeholder = GraphManager(frame2, df)
         placeholder.pack(expand=True, fill="both", anchor=tk.CENTER)
         from_label = tk.Label(frame1, text="From:")
-        from_combo = ttk.Combobox(frame1,font=self.default_font,
-                                  textvariable=self.from_city)
+        from_combo = ttk.Combobox(frame1,font=self.default_font)
+        self.comboboxes.append(from_combo)
         to_label = tk.Label(frame1, text="To:")
-        to_combo = ttk.Combobox(frame1,font=self.default_font,
-                                textvariable=self.to_city)
+        to_combo = ttk.Combobox(frame1,font=self.default_font)
+        self.comboboxes.append(to_combo)
         flight_label = tk.Label(frame1, text="Flight:")
-        flight_combo = ttk.Combobox(frame1,font=self.default_font,
-                                    textvariable=self.flight)
+        flight_combo = ttk.Combobox(frame1,font=self.default_font)
+        self.comboboxes.append(flight_combo)
         settings = {"padx":10, "pady":5, "anchor":tk.W,
                     "expand":True, "fill":"y"}
         from_label.pack(**settings)
@@ -115,8 +115,8 @@ class VisualizerUI(tk.Tk):
         placeholder = GraphManager(mainframe, df)
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")
-        graph_select = ttk.Combobox(frame1,font=self.default_font,
-                                    textvariable=self.cur_graph)
+        graph_select = ttk.Combobox(frame1,font=self.default_font)
+        self.comboboxes.append(graph_select)
         sum_label = tk.Label(frame2, text="Exploration:")
         sum_text = tk.Text(frame2)
         settings = {"padx": 10, "pady": 5, "expand": True,
@@ -139,27 +139,34 @@ class VisualizerUI(tk.Tk):
 
 class Observer(abc.ABC):
     @abc.abstractmethod
-    def update(self, logic):
+    def update_graph(self, logic):
         """Receive an update from the model"""
         raise NotImplementedError
 
 
 class GraphManager(tk.Frame, Observer):
     """A class for managing graphs"""
-    def __init__(self, parent, df, type=1):
+    def __init__(self, parent, df, graph_type=1):
         super().__init__(parent)
         self.df = df
-        self.type = type
-        self.draw()
+        self.type = graph_type
+        self.draw_dist_plot()
 
-    def update(self, logic):
+    def update_graph(self, logic):
         if self.type == logic.state:
-            pass
+            self.df = logic.cur_df
+            self.draw()
 
     def draw(self):
+        if self.type == 1:
+            self.draw_dist_plot()
+
+    def draw_dist_plot(self):
         """Draw the graph from the dataframe"""
-        fig, ax = plt.subplots(figsize=(6,6), dpi=100)
-        sns.histplot(df, x="price")
+        fig, ax = plt.subplots()
+        ax.set_title("price distribution of flights from x to y")
+        ax.set_xlabel("price (rupee)")
+        sns.histplot(data=df, x="price", log_scale=True)
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
