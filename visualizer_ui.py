@@ -20,6 +20,7 @@ class VisualizerUI(tk.Tk):
         super().__init__()
         self.title("Indian flight visualizer")
         self.comboboxes = []
+        self.graphs = []
         self.price_analysis = None
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
@@ -60,7 +61,8 @@ class VisualizerUI(tk.Tk):
         text_label.pack(expand=True, fill='both')
         self.price_analysis = tk.Text(frame3, font=self.default_font)
         self.price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
-        placeholder = GraphManager(frame2, df)
+        placeholder = GraphManager(frame2)
+        self.graphs.append(placeholder)
         placeholder.pack(expand=True, fill="both", anchor=tk.CENTER)
         from_label = tk.Label(frame1, text="From:")
         from_combo = ttk.Combobox(frame1,font=self.default_font)
@@ -94,7 +96,8 @@ class VisualizerUI(tk.Tk):
                              label="mode:")
         type_select = Keypad(frame2, ["Distribution", "Scatter",
                                     "Histogram"], label="Type:")
-        graph = GraphManager(mainframe, df)
+        graph = GraphManager(mainframe)
+        self.graphs.append(graph)
         statistic = tk.Text(frame2)
         mainframe.pack(fill="both", expand=True)
         mainframe.grid_columnconfigure((0,1,3), uniform="1", weight=1)
@@ -112,7 +115,8 @@ class VisualizerUI(tk.Tk):
         """Initializes the data summary page"""
         mainframe = tk.Frame(self)
         frame1 = tk.Frame(mainframe)
-        placeholder = GraphManager(mainframe, df)
+        placeholder = GraphManager(mainframe)
+        self.graphs.append(placeholder)
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")
         graph_select = ttk.Combobox(frame1,font=self.default_font)
@@ -146,34 +150,28 @@ class Observer(abc.ABC):
 
 class GraphManager(tk.Frame, Observer):
     """A class for managing graphs"""
-    def __init__(self, parent, df, graph_type=1):
+    def __init__(self, parent, graph_type=1):
         super().__init__(parent)
-        self.df = df
         self.type = graph_type
-        self.draw_dist_plot()
 
     def update_graph(self, logic):
         if self.type == logic.state:
-            self.df = logic.cur_df
-            self.draw()
+            self.draw(logic)
 
-    def draw(self):
+    def draw(self, logic):
         if self.type == 1:
-            self.draw_dist_plot()
+            self.draw_dist_plot(logic.cur_df, logic.pair)
 
-    def draw_dist_plot(self):
+    def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
         fig, ax = plt.subplots()
-        ax.set_title("price distribution of flights from x to y")
+        ax.set_title(f"price distribution of flights from {pair[0]} to {pair[1]}")
         ax.set_xlabel("price (rupee)")
-        sns.histplot(data=df, x="price", log_scale=True)
+        sns.histplot(data=data, x="price", log_scale=True, hue="class")
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-    def update_graph(self, x,y):
-        """Updates the graph"""
-        pass
 
 if __name__ == "__main__":
     f = VisualizerUI()
