@@ -25,6 +25,8 @@ class DataframeLogic(LogicSubject):
         self._observers: list[Observer] = []
         self.orig_df = df
         self.cur_df = self.orig_df.copy()
+        self.eco = None
+        self.business = None
         self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
@@ -35,7 +37,7 @@ class DataframeLogic(LogicSubject):
 
     def notify(self):
         for observers in self._observers:
-            observers.update(self)
+            observers.update_graph(self)
 
     def group_by(self, parameter, value):
         pass
@@ -52,44 +54,61 @@ class DataframeLogic(LogicSubject):
         df = self.orig_df[self.orig_df.source_city == source]
         df = df[df.destination_city == end]
         self.cur_df = df
+        self.eco = self.cur_df[self.cur_df["class"] == "Economy"]
+        self.business = self.cur_df[self.cur_df["class"] == "Business"]
 
     def get_flight_info(self, flight_code):
         df = self.orig_df[self.orig_df["flight"] == flight_code]
         flight = df.iloc[0]
         airline = flight.airline
         stops = flight.stops
-        start = flight.arrival_time
-        end = flight.departure_time
-        return airline, stops, start, end
+        start = flight.departure_time
+        end = flight.arrival_time
+        price = flight.price
+        f_class = flight["class"]
+        if f_class == "Economy":
+            self.cur_df = self.eco
+        else:
+            self.cur_df = self.business
+        return airline, stops, start, end, price
 
     def generate_price_analysis(self, flight_code):
-        airline, stops, start, end = self.get_flight_info(flight_code)
+        airline, stops, start, end, price = self.get_flight_info(flight_code)
         airline = self.get_airline_analysis(airline)
         stop = self.get_stop_analysis(stops)
         time = self.get_time_analysis(start, end)
-        analysis = (f"Flight {flight_code} is {flight_code} baht cheaper than "
-                    f"other similar flights\nThe price of the flight is "
-                    f"influenced by the following factors:\n")
+        price_avg = self.cur_df.price.mean()
+        if price < price_avg:
+            dif = price_avg - price
+            analysis = (f"Flight {flight_code} is {dif:.02f} rupee cheaper than "
+                        f"other similar flights\nThe price of the flight is "
+                        f"influenced by the following factors:\n")
+        else:
+            dif = price - price_avg
+            analysis = (f"Flight {flight_code} is {dif:.2f} rupee more expensive "
+                        f"than other similar flights\nThe price of the flight "
+                        f"is influenced by the following factors:\n")
         analysis += f"Airline: " + airline
         analysis += f"Number of stops: " + stop
         analysis += f"Time of day: " + time
         return analysis
 
     def get_airline_analysis(self, airline):
-        price_median = self.cur_df.price.median()
-        airline_median = self.cur_df.groupby("airline").price.median()
+        price_median = self.cur_df.price.mean()
+        airline_median = self.cur_df.groupby("airline").price.mean()
         airline_med_price = airline_median[airline]
         if airline_med_price < price_median:
             percent = ((price_median-airline_med_price)/price_median)*100
             return (f"{airline} on average provides {percent:.0f} percent "
-                    f"cheaper \nflights compared to similar flights.\n")
+                    f"cheaper \nflights compared to similar flights"
+                    f" from other airlines.\n")
         percent = ((airline_med_price-price_median) / price_median) * 100
         return (f"{airline} on average provides {percent:.0f} percent\n"
                 f"more expensive flights compared to similar flights.\n")
 
     def get_stop_analysis(self, stops):
-        price_median = self.cur_df.price.median()
-        stop_median = self.cur_df.groupby("stops").price.median()
+        price_median = self.cur_df.price.mean()
+        stop_median = self.cur_df.groupby("stops").price.mean()
         stop_med_price = stop_median[stops]
         if stop_med_price < price_median:
             percent = ((price_median-stop_med_price)/price_median)*100
@@ -103,8 +122,8 @@ class DataframeLogic(LogicSubject):
 
     def get_time_analysis(self, dep_time, end_time):
         sorted_df = self.cur_df[self.cur_df.departure_time == dep_time]
-        price_median = sorted_df.price.median()
-        time_median = sorted_df.groupby("arrival_time").price.median()
+        price_median = sorted_df.price.mean()
+        time_median = sorted_df.groupby("arrival_time").price.mean()
         time_med_price = time_median[end_time]
         if time_med_price < price_median:
             percent = ((price_median-time_med_price)/price_median)*100
@@ -146,5 +165,5 @@ if __name__ == "__main__":
     print(test.cur_df.head().source_city)
     print(test.cur_df.head().destination_city)
     print(test.get_stop_analysis(2))
-    print(test.get_flight_info("SG-8709"))
-    print(test.generate_price_analysis("SG-8709"))
+    print(test.get_flight_info("AI-803"))
+    print(test.generate_price_analysis("AI-803"))
