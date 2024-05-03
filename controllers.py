@@ -1,5 +1,6 @@
 """Controllers for the visualizer's UI"""
 import tkinter as tk
+from tkinter import messagebox
 import threading
 
 
@@ -7,6 +8,7 @@ class Controller:
     def __init__(self, ui, logic):
         self.main = ui
         self.logic = logic
+        self.valid_airports = self.logic.get_airport_names()
         self.get_combobox_values()
         self.get_default_graphs()
         self.bind_components()
@@ -29,6 +31,9 @@ class Controller:
 
     def get_valid_destination(self, event):
         src = event.widget.get()
+        if src not in self.valid_airports:
+            self.raise_invalid_airport()
+            return
         self.main.comboboxes[1]["values"] = self.logic.get_dest_airports(src)
         self.main.comboboxes[1].delete(0, "end")
         self.main.comboboxes[2].delete(0, "end")
@@ -42,6 +47,9 @@ class Controller:
     def update_dist_graph(self, event):
         if event.widget.get() != "":
             src = self.main.comboboxes[0].get()
+            if src not in self.valid_airports:
+                self.raise_invalid_airport()
+                return
             self.main.comboboxes[2].config(state="active")
             self.main.comboboxes[2].delete(0, "end")
             update_thread = threading.Thread(target=self.logic.pair_city(src, event.widget.get()))
@@ -57,4 +65,10 @@ class Controller:
         self.main.price_analysis.insert(tk.END,
                                         self.logic.generate_price_analysis(flight))
         self.main.price_analysis.config(state="disabled")
+
+    def raise_invalid_airport(self):
+        for i in range(1):
+            self.main.comboboxes[i].delete(0, "end")
+        tk.messagebox.showerror("Value error",
+                                message="Invalid airport")
 
