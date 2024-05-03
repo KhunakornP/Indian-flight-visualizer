@@ -1,4 +1,5 @@
 import abc
+import threading
 import tkinter as tk
 from tkinter import ttk, font
 import matplotlib
@@ -153,10 +154,18 @@ class GraphManager(tk.Frame, Observer):
     def __init__(self, parent, graph_type=1):
         super().__init__(parent)
         self.type = graph_type
+        self.init_components()
+
+    def init_components(self):
+        self.fig, self.ax = plt.subplots()
+        self.canvas = FigureCanvasTkAgg(figure=self.fig, master=self)
+        self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH,
+                                         expand=True)
 
     def update_graph(self, logic):
         if self.type == logic.state:
-            self.draw(logic)
+            update_thread = threading.Thread(target=self.draw(logic))
+            update_thread.start()
 
     def draw(self, logic):
         if self.type == 1:
@@ -164,13 +173,12 @@ class GraphManager(tk.Frame, Observer):
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
-        fig, ax = plt.subplots()
-        ax.set_title(f"price distribution of flights from {pair[0]} to {pair[1]}")
-        ax.set_xlabel("price (rupee)")
-        sns.histplot(data=data, x="price", log_scale=True, hue="class")
-        canvas = FigureCanvasTkAgg(fig, self)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.ax.clear()
+        self.ax.set_title(f"price distribution of flights from {pair[0]} to {pair[1]}")
+        self.ax.set_xlabel("price (rupee)")
+        sns.histplot(data=data, x="price", log_scale=True,
+                               hue="class", ax=self.ax)
+        self.canvas.draw()
 
 
 if __name__ == "__main__":
