@@ -30,6 +30,8 @@ class Controller:
         src = event.widget.get()
         self.main.comboboxes[1]["values"] = self.logic.get_dest_airports(src)
         self.main.comboboxes[1].delete(0, "end")
+        self.main.comboboxes[2].delete(0, "end")
+        self.main.comboboxes[2].config(state="disabled")
 
     def get_default_graphs(self):
         for graphs in self.main.graphs:
@@ -40,7 +42,7 @@ class Controller:
         if event.widget.get() != "":
             src = self.main.comboboxes[0].get()
             self.logic.pair_city(src, event.widget.get())
-
+            self.main.comboboxes[2].config(state="active")
 
     def get_price_analysis(self, event):
         for i in range(3):

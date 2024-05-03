@@ -70,7 +70,6 @@ class DataframeLogic(LogicSubject):
         end = flight.arrival_time
         price = flight.price
         f_class = flight["class"]
-        print(f_class)
         if f_class == "Economy":
             self.cur_df = self.eco
         else:
