@@ -52,7 +52,9 @@ class Controller:
             if self.main.comboboxes[i].get() == "":
                 return
         flight = event.widget.get()
+        self.main.price_analysis.config(state="normal")
         self.main.price_analysis.delete(1.0, "end")
         self.main.price_analysis.insert(tk.END,
                                         self.logic.generate_price_analysis(flight))
+        self.main.price_analysis.config(state="disabled")
 

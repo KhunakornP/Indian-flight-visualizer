@@ -25,12 +25,13 @@ class VisualizerUI(tk.Tk):
         self.price_analysis = None
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
-        self.init_menu()
-        self.init_notebook()
+        self.init_components()
 
     def init_components(self):
         """Initializes the ui components"""
-        pass
+        self.option_add("*TCombobox*Listbox*Font", self.default_font)
+        self.init_menu()
+        self.init_notebook()
 
     def init_menu(self):
         """Initialize the top menu of the ui"""
@@ -45,7 +46,7 @@ class VisualizerUI(tk.Tk):
 
     def init_notebook(self):
         """Initializes the notebook"""
-        notebook = ttk.Notebook(self,width=1200, height=600)
+        notebook = ttk.Notebook(self,width=2000, height=1000)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
@@ -60,8 +61,10 @@ class VisualizerUI(tk.Tk):
         frame3 = tk.Frame(mainframe)
         text_label = tk.Label(frame3, text="Price analysis", anchor=tk.N)
         text_label.pack(expand=True, fill='both')
-        self.price_analysis = tk.Text(frame3, font=self.default_font)
+        self.price_analysis = tk.Text(frame3, font=self.default_font,
+                                      width=0, height=20)
         self.price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
+        self.price_analysis.configure(state="disabled")
         placeholder = GraphManager(frame2)
         self.graphs.append(placeholder)
         placeholder.pack(expand=True, fill="both", anchor=tk.CENTER)
@@ -74,17 +77,23 @@ class VisualizerUI(tk.Tk):
         flight_label = tk.Label(frame1, text="Flight:")
         flight_combo = ttk.Combobox(frame1,font=self.default_font)
         self.comboboxes.append(flight_combo)
-        settings = {"padx":10, "pady":5, "anchor":tk.W,
-                    "expand":True, "fill":"y"}
+        settings = {"padx":5, "pady":5, "anchor":tk.W,
+                    "expand":True, "fill":"both"}
         from_label.pack(**settings)
         from_combo.pack(**settings)
         to_label.pack(**settings)
         to_combo.pack(**settings)
         flight_label.pack(**settings)
         flight_combo.pack(**settings)
-        frame1.pack(fill="both", expand=True, side=tk.LEFT)
-        frame2.pack(fill="both", expand=True, side=tk.LEFT)
-        frame3.pack(fill="both", expand=True, side=tk.RIGHT)
+        mainframe.grid_columnconfigure((0, 1, 2, 3, 4, 5),
+                                       uniform="1", weight=1)
+        mainframe.grid_rowconfigure((0, 1), uniform="1", weight=1)
+        settings = {"padx":5, "pady":5}
+        frame1.grid(row=0, column=0, sticky="nsew", rowspan=2, **settings)
+        frame2.grid(row=0, column=1, sticky="nsew", rowspan=2, columnspan=3,
+                    **settings)
+        frame3.grid(row=0, column=4, sticky="nsew", rowspan=2, columnspan=2,
+                    **settings)
         mainframe.pack(fill='both', expand=True)
         return mainframe
 
@@ -101,7 +110,7 @@ class VisualizerUI(tk.Tk):
         self.graphs.append(graph)
         statistic = tk.Text(frame2)
         mainframe.pack(fill="both", expand=True)
-        mainframe.grid_columnconfigure((0,1,3), uniform="1", weight=1)
+        mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
         settings = {"padx": 10, "pady": 5, "expand": True,
                     "fill": "both"}

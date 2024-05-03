@@ -84,17 +84,19 @@ class DataframeLogic(LogicSubject):
         price_avg = self.cur_df.price.mean()
         if price < price_avg:
             dif = price_avg - price
-            analysis = (f"Flight {flight_code} is {dif:.02f} rupee cheaper than "
-                        f"other similar flights\nThe price of the flight is "
-                        f"influenced by the following factors:\n")
+            analysis = (f"Flight {flight_code} is {dif:.02f} rupee cheaper "
+                        f"than other similar flights.\nThe price of the "
+                        f"flight is influenced by the following factors:\n")
         else:
             dif = price - price_avg
-            analysis = (f"Flight {flight_code} is {dif:.2f} rupee more expensive "
-                        f"than other similar flights\nThe price of the flight "
-                        f"is influenced by the following factors:\n")
-        analysis += f"Airline: " + airline
-        analysis += f"Number of stops: " + stop
-        analysis += f"Time of day: " + time
+            analysis = (f"Flight {flight_code} is {dif:.2f} rupee more "
+                        f"expensive than other\nsimilar flights.\nThe price "
+                        f"of the flight is influenced by the following "
+                        f"factors:\n")
+
+        analysis += f"\nAirline: " + airline
+        analysis += f"\nNumber of stops: " + stop
+        analysis += f"\nTime of day: " + time
         return analysis
 
     def get_airline_analysis(self, airline):
@@ -131,12 +133,12 @@ class DataframeLogic(LogicSubject):
         time_med_price = time_median[end_time]
         if time_med_price < price_median:
             percent = ((price_median-time_med_price)/price_median)*100
-            return (f"A flight from {dep_time} to {end_time} on average "
-                    f"decreases\nprices by {percent:.0f} percent compared to "
+            return (f"A flight from {dep_time} to {end_time} on average\n"
+                    f"decreases prices by {percent:.0f} percent compared to "
                     f"similar flights.\n")
         percent = ((time_med_price-price_median) / price_median) * 100
-        return (f"A flight from {dep_time} to {end_time} on average "
-                f"decreases\nprices by {percent:.0f} percent compared to "
+        return (f"A flight from {dep_time} to {end_time} on average\n"
+                f"decreases prices by {percent:.0f} percent compared to "
                 f"similar flights.\n")
 
     def get_data_summary(self, page):
