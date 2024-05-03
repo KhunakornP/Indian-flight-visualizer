@@ -1,5 +1,4 @@
 import abc
-import threading
 import tkinter as tk
 from tkinter import ttk, font
 import matplotlib
@@ -9,10 +8,6 @@ import seaborn as sns
 import pandas as pd
 from keypad import Keypad
 matplotlib.use("TkAgg")
-
-
-# for testing
-df = pd.read_csv("Indian Airlines.csv")
 
 
 class VisualizerUI(tk.Tk):
@@ -38,10 +33,7 @@ class VisualizerUI(tk.Tk):
         menu_font = self.default_font
         menu_font.configure(size=18)
         menu_bar = tk.Menu(self)
-        file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.quit, font=menu_font)
-        menu_bar.add_cascade(label="File", menu=file_menu, font=menu_font)
+        menu_bar.add_cascade(label="Exit", command=self.quit, font=menu_font)
         self.configure(menu=menu_bar)
 
     def init_notebook(self):
@@ -106,9 +98,10 @@ class VisualizerUI(tk.Tk):
                              label="mode:")
         type_select = Keypad(frame2, ["Distribution", "Scatter",
                                     "Histogram"], label="Type:")
-        graph = GraphManager(mainframe)
+        graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
-        statistic = tk.Text(frame2)
+        statistic = tk.Text(frame2, font=self.default_font)
+        statistic.insert("end", "Descriptive statistics to be added")
         mainframe.pack(fill="both", expand=True)
         mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
@@ -125,7 +118,7 @@ class VisualizerUI(tk.Tk):
         """Initializes the data summary page"""
         mainframe = tk.Frame(self)
         frame1 = tk.Frame(mainframe)
-        placeholder = GraphManager(mainframe)
+        placeholder = GraphManager(mainframe, 3)
         self.graphs.append(placeholder)
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")

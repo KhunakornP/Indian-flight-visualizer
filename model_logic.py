@@ -21,8 +21,8 @@ class LogicSubject(abc.ABC):
 
 
 class DataframeLogic(LogicSubject):
+    _observers: list[Observer] = []
     def __init__(self, df):
-        self._observers: list[Observer] = []
         self.state = 1
         self.orig_df = df
         self.cur_df = self.orig_df.copy()

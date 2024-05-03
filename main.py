@@ -4,8 +4,9 @@ from model_logic import DataframeLogic
 from controllers import Controller
 
 
-orig_df = pd.read_csv("Indian Airlines.csv")
-model = DataframeLogic(orig_df)
-ui = VisualizerUI()
-controller = Controller(ui, model)
-controller.main.run()
+if __name__ == "__main__":
+    orig_df = pd.read_csv("Indian Airlines.csv")
+    model = DataframeLogic(orig_df)
+    ui = VisualizerUI()
+    controller = Controller(ui, model)
+    controller.main.run()
