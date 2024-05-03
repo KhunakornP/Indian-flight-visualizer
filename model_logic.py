@@ -23,10 +23,12 @@ class LogicSubject(abc.ABC):
 class DataframeLogic(LogicSubject):
     def __init__(self, df):
         self._observers: list[Observer] = []
+        self.state = 1
         self.orig_df = df
         self.cur_df = self.orig_df.copy()
         self.eco = None
         self.business = None
+        self.pair = ("Delhi", "Mumbai")
         self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
@@ -54,8 +56,10 @@ class DataframeLogic(LogicSubject):
         df = self.orig_df[self.orig_df.source_city == source]
         df = df[df.destination_city == end]
         self.cur_df = df
+        self.pair = (source, end)
         self.eco = self.cur_df[self.cur_df["class"] == "Economy"]
         self.business = self.cur_df[self.cur_df["class"] == "Business"]
+        self.notify()
 
     def get_flight_info(self, flight_code):
         df = self.orig_df[self.orig_df["flight"] == flight_code]
@@ -66,6 +70,7 @@ class DataframeLogic(LogicSubject):
         end = flight.arrival_time
         price = flight.price
         f_class = flight["class"]
+        print(f_class)
         if f_class == "Economy":
             self.cur_df = self.eco
         else:
@@ -138,9 +143,6 @@ class DataframeLogic(LogicSubject):
     def get_data_summary(self, page):
         pass
 
-    def update_graph(self):
-        pass
-
     def get_airport_names(self):
         """
         Gets all available airport names in the dataframe
@@ -150,13 +152,17 @@ class DataframeLogic(LogicSubject):
         cities = self.orig_df.source_city.unique()
         return cities.tolist()
 
+    def get_dest_airports(self, start):
+        cities = self.orig_df[self.orig_df.source_city == start]
+        return cities.destination_city.unique().tolist()
+
     def get_flight_codes(self):
         """
         Gets all available flights from the current dataframe
 
         :return: A list of flight codes from the current dataframe
         """
-        return self.cur_df.flight.tolist()
+        return self.cur_df.flight.unique().tolist()
 
 
 if __name__ == "__main__":
