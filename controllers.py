@@ -1,5 +1,6 @@
 """Controllers for the visualizer's UI"""
 import tkinter as tk
+import threading
 
 
 class Controller:
@@ -41,8 +42,10 @@ class Controller:
     def update_dist_graph(self, event):
         if event.widget.get() != "":
             src = self.main.comboboxes[0].get()
-            self.logic.pair_city(src, event.widget.get())
             self.main.comboboxes[2].config(state="active")
+            self.main.comboboxes[2].delete(0, "end")
+            update_thread = threading.Thread(target=self.logic.pair_city(src, event.widget.get()))
+            update_thread.start()
 
     def get_price_analysis(self, event):
         for i in range(3):

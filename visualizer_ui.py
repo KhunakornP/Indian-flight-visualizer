@@ -164,8 +164,7 @@ class GraphManager(tk.Frame, Observer):
 
     def update_graph(self, logic):
         if self.type == logic.state:
-            update_thread = threading.Thread(target=self.draw(logic))
-            update_thread.start()
+            self.draw(logic)
 
     def draw(self, logic):
         if self.type == 1:
