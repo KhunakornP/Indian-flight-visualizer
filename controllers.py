@@ -20,6 +20,7 @@ class Controller:
                                      self.update_dist_graph)
         self.main.comboboxes[2].bind("<<ComboboxSelected>>",
                                      self.get_price_analysis)
+        self.main.comboboxes[2].bind("<Return>", self.get_price_analysis)
 
     def get_combobox_values(self):
         self.main.comboboxes[0]["values"] = self.logic.get_airport_names()

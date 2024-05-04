@@ -63,6 +63,8 @@ class DataframeLogic(LogicSubject):
 
     def get_flight_info(self, flight_code):
         df = self.orig_df[self.orig_df["flight"] == flight_code]
+        if len(df) == 0:
+            return None, None, None, None, None, None, None
         flight = df.iloc[0]
         airline = flight.airline
         stops = flight.stops
@@ -80,6 +82,8 @@ class DataframeLogic(LogicSubject):
     def generate_price_analysis(self, flight_code):
         (airline, stops, start, end,
          price, dur, f_class) = self.get_flight_info(flight_code)
+        if airline is None:
+            return f"Flight not found"
         airline = self.get_airline_analysis(airline)
         stop = self.get_stop_analysis(stops)
         time = self.get_time_analysis(start, end)

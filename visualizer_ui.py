@@ -175,7 +175,8 @@ class GraphManager(tk.Frame, Observer):
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
         self.ax.clear()
-        self.ax.set_title(f"price distribution of flights from {pair[0]} to {pair[1]}")
+        self.ax.set_title(f"price distribution of flights from {pair[0]}"
+                          f" to {pair[1]}")
         self.ax.set_xlabel("price (rupee)")
         sns.histplot(data=data, x="price", log_scale=True,
                                hue="class", ax=self.ax)
