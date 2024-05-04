@@ -38,7 +38,7 @@ class VisualizerUI(tk.Tk):
 
     def init_notebook(self):
         """Initializes the notebook"""
-        notebook = ttk.Notebook(self,width=2000, height=1000)
+        notebook = ttk.Notebook(self,width=1000, height=600)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
@@ -53,8 +53,12 @@ class VisualizerUI(tk.Tk):
         frame3 = tk.Frame(mainframe)
         text_label = tk.Label(frame3, text="Price analysis", anchor=tk.N)
         text_label.pack(expand=True, fill='both')
+        scrollbar = tk.Scrollbar(frame3)
         self.price_analysis = tk.Text(frame3, font=self.default_font,
-                                      width=0, height=20)
+                                      width=0, height=20, wrap=tk.WORD,
+                                      yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill="y")
+        scrollbar.configure(command=self.price_analysis.yview)
         self.price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
         self.price_analysis.configure(state="disabled")
         placeholder = GraphManager(frame2)
