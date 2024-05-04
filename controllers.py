@@ -54,6 +54,7 @@ class Controller:
             self.main.comboboxes[2].delete(0, "end")
             update_thread = threading.Thread(target=self.logic.pair_city(src, event.widget.get()))
             update_thread.start()
+            self.main.comboboxes[2]["values"] = self.logic.get_flight_codes()
 
     def get_price_analysis(self, event):
         for i in range(3):

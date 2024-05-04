@@ -70,34 +70,46 @@ class DataframeLogic(LogicSubject):
         end = flight.arrival_time
         price = flight.price
         f_class = flight["class"]
+        duration = flight.duration
         if f_class == "Economy":
             self.cur_df = self.eco
         else:
             self.cur_df = self.business
-        return airline, stops, start, end, price
+        return airline, stops, start, end, price, duration, f_class
 
     def generate_price_analysis(self, flight_code):
-        airline, stops, start, end, price = self.get_flight_info(flight_code)
+        (airline, stops, start, end,
+         price, dur, f_class) = self.get_flight_info(flight_code)
         airline = self.get_airline_analysis(airline)
         stop = self.get_stop_analysis(stops)
         time = self.get_time_analysis(start, end)
         price_avg = self.cur_df.price.mean()
+        duration = self.get_average_cost_per_dist(dur)
+        timeframe = f'{start} to {end}'
+        statistic = (f"Flight:{flight_code:30}  Stops: {stops} stop(s)\n"
+                     f"Time :{timeframe:28}Price: {price} rupees\n"
+                     f"Duration : {str(dur) + ' hours':26}Class: {f_class}\n"
+                     f"The average cost of a flight from {self.pair[0]} to "
+                     f"{self.pair[1]}\nis {price_avg:.2f} rupees\n")
         if price < price_avg:
             dif = price_avg - price
-            analysis = (f"Flight {flight_code} is {dif:.02f} rupee cheaper "
-                        f"than other similar flights.\nThe price of the "
+            analysis = (f"\nFlight {flight_code} is {dif:.02f} rupee cheaper "
+                        f"than the average\ncost of flights from "
+                        f"{self.pair[0]} to {self.pair[1]}.\nThe price of the "
                         f"flight is influenced by the following factors:\n")
         else:
             dif = price - price_avg
-            analysis = (f"Flight {flight_code} is {dif:.2f} rupee more "
-                        f"expensive than other\nsimilar flights.\nThe price "
+            analysis = (f"\nFlight {flight_code} is {dif:.2f} rupee more "
+                        f"expensive\nthan the average cost of flights from "
+                        f"{self.pair[0]} to {self.pair[1]}.\nThe price "
                         f"of the flight is influenced by the following "
                         f"factors:\n")
-
+        analysis += f"\nDuration: " + duration
         analysis += f"\nAirline: " + airline
         analysis += f"\nNumber of stops: " + stop
         analysis += f"\nTime of day: " + time
-        return analysis
+        statistic += analysis
+        return statistic
 
     def get_airline_analysis(self, airline):
         price_median = self.cur_df.price.mean()
@@ -141,6 +153,15 @@ class DataframeLogic(LogicSubject):
                 f"decreases prices by {percent:.0f} percent compared to "
                 f"similar flights.\n")
 
+    def get_average_cost_per_dist(self, duration):
+        time = int(duration)
+        df = self.orig_df[self.orig_df["class"] == 'Economy']
+        sorted_df = df[(df.duration >= time) &
+                       (df.duration < time + 1)]
+        med_price = sorted_df.price.mean()
+        return (f"A flight with a duration of {duration} hours\n"
+                f"on average costs {med_price:.2f} rupees\n")
+
     def get_data_summary(self, page):
         pass
 
@@ -174,3 +195,4 @@ if __name__ == "__main__":
     print(test.get_stop_analysis(2))
     print(test.get_flight_info("AI-803"))
     print(test.generate_price_analysis("AI-803"))
+    print(test.get_average_cost_per_dist(24))
