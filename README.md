@@ -11,7 +11,7 @@ Airline, number of stops and time of day on the price of the flight.
 - Install or have python installed on your device
 - Clone this repository
 
-### How to run
+### How to run the program
 1. Create a virtual environment (Optional)
 ```
 python -m venv env
@@ -25,7 +25,7 @@ env/bin/activate
 ```
 3. Install dependencies
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 4. Run the program
 ```
