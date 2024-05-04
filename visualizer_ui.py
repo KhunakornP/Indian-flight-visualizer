@@ -97,6 +97,7 @@ class VisualizerUI(tk.Tk):
         """Initializes the flight planner page"""
         mainframe = tk.Frame(self)
         frame2 = tk.Frame(mainframe)
+        frame1 = tk.Frame(mainframe)
         mode_select = Keypad(frame2, ["Availability","Days booked",
                                     "Frequency", "By airport", "By pair"],
                              label="mode:")
@@ -104,18 +105,37 @@ class VisualizerUI(tk.Tk):
                                     "Histogram"], label="Type:")
         graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
-        statistic = tk.Text(frame2, font=self.default_font)
-        statistic.insert("end", "Descriptive statistics to be added")
+        statistic = tk.Text(frame2, font=self.default_font, width=60,
+                            wrap=tk.WORD)
+        statistic.insert("end", "Descriptive statistics to be added\n"
+                                "also graph doesn't work yet\n"
+                                "apologies for the inconvenience")
         mainframe.pack(fill="both", expand=True)
+        x_label = tk.Label(frame1, text="X axis:")
+        x_combo = ttk.Combobox(frame1, font=self.default_font)
+        self.comboboxes.append(x_combo)
+        y_label = tk.Label(frame1, text="Y axis:")
+        y_combo = ttk.Combobox(frame1, font=self.default_font)
+        self.comboboxes.append(y_combo)
+        scale_label = tk.Label(frame1, text="Scaling")
+        scale_combo = ttk.Combobox(frame1, font=self.default_font)
+        self.comboboxes.append(scale_combo)
         mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
-        settings = {"padx": 10, "pady": 5, "expand": True,
+        settings = {"padx": 5, "pady": 5, "expand": True,
                     "fill": "both"}
+        x_label.pack(**settings)
+        x_combo.pack(**settings)
+        y_label.pack(**settings)
+        y_combo.pack(**settings)
+        scale_label.pack(**settings)
+        scale_combo.pack(**settings)
         mode_select.pack(**settings, side=tk.LEFT)
         type_select.pack(**settings, side=tk.LEFT)
         statistic.pack(**settings, side=tk.LEFT)
+        frame1.grid(row=0, column=2, sticky="nsew", rowspan=2)
         frame2.grid(row=0, column=0, sticky="ew", columnspan=2)
-        graph.grid(row=1, column=0, sticky="ew",columnspan=2, padx=10, pady=5)
+        graph.grid(row=1, column=0, sticky="ew",columnspan=2)
         return mainframe
 
     def init_data_summary(self):
@@ -130,16 +150,21 @@ class VisualizerUI(tk.Tk):
         self.comboboxes.append(graph_select)
         sum_label = tk.Label(frame2, text="Exploration:")
         sum_text = tk.Text(frame2)
-        settings = {"padx": 10, "pady": 5, "expand": True,
-                    "fill": "both"}
+        settings = {"pady": 5, "expand": True, "fill": "both"}
         graph_label.pack(**settings, anchor=tk.N)
-        graph_select.pack(expand=True, fill="both", pady=150, padx=10
+        graph_select.pack(expand=True, fill="both", pady=200
                           , anchor=tk.CENTER)
         sum_label.pack(**settings)
         sum_text.pack(**settings)
-        frame1.pack(fill="both", expand=True, side=tk.LEFT)
-        placeholder.pack(fill="both", expand=True, side=tk.LEFT)
-        frame2.pack(fill="both", expand=True, side=tk.RIGHT)
+        mainframe.grid_columnconfigure((0, 1, 2, 3, 4, 5),
+                                       uniform="1", weight=1)
+        mainframe.grid_rowconfigure((0, 1), uniform="1", weight=1)
+        settings = {"padx": 5, "pady": 5}
+        frame1.grid(row=0, column=0, sticky="nsew", rowspan=2, **settings)
+        placeholder.grid(row=0, column=1, sticky="nsew", rowspan=2, columnspan=3,
+                    **settings)
+        frame2.grid(row=0, column=4, sticky="nsew", rowspan=2, columnspan=2,
+                    **settings)
         mainframe.pack(fill="both", expand=True)
         return mainframe
 
