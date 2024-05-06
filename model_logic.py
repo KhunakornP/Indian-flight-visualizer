@@ -1,6 +1,7 @@
 import abc
 from visualizer_ui import Observer
 import pandas as pd
+import os
 
 
 class LogicSubject(abc.ABC):
@@ -29,6 +30,8 @@ class DataframeLogic(LogicSubject):
         self.eco = None
         self.business = None
         self.pair = ("Delhi", "Mumbai")
+        self.graph_type = "Histogram"
+        self.arguments = {}
         self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
@@ -40,6 +43,12 @@ class DataframeLogic(LogicSubject):
     def notify(self):
         for observers in self._observers:
             observers.update_graph(self)
+
+    def get_availability(self):
+        self.cur_df = self.cur_df.groupby(["departure_time",
+                                           "arrival_time"]).airline.count()
+        self.graph_type = "Availability"
+        self.notify()
 
     def group_by(self, parameter, value):
         pass
@@ -192,7 +201,8 @@ class DataframeLogic(LogicSubject):
 
 
 if __name__ == "__main__":
-    test = DataframeLogic(pd.read_csv("Indian Airlines.csv"))
+    test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
+                                       "Indian Airlines.csv")))
     test.pair_city("Delhi", "Mumbai")
     print(test.cur_df.head().source_city)
     print(test.cur_df.head().destination_city)
@@ -200,3 +210,5 @@ if __name__ == "__main__":
     print(test.get_flight_info("AI-803"))
     print(test.generate_price_analysis("AI-803"))
     print(test.get_average_cost_per_dist(24))
+    test.get_availability()
+    print(test.cur_df["Afternoon"])

@@ -16,11 +16,16 @@ class VisualizerUI(tk.Tk):
         super().__init__()
         self.title("Indian flight visualizer")
         self.comboboxes = []
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.graphs = []
         self.price_analysis = None
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
         self.init_components()
+
+    def on_close(self):
+        """Handle window close events"""
+        self.quit()
 
     def init_components(self):
         """Initializes the ui components"""
@@ -102,7 +107,7 @@ class VisualizerUI(tk.Tk):
                                     "Frequency", "By airport", "By pair"],
                              label="mode:")
         type_select = Keypad(frame2, ["Distribution", "Scatter",
-                                    "Histogram"], label="Type:")
+                                    "Pie chart"], label="Type:")
         graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
         statistic = tk.Text(frame2, font=self.default_font, width=60,
@@ -117,9 +122,10 @@ class VisualizerUI(tk.Tk):
         y_label = tk.Label(frame1, text="Y axis:")
         y_combo = ttk.Combobox(frame1, font=self.default_font)
         self.comboboxes.append(y_combo)
-        scale_label = tk.Label(frame1, text="Scaling")
+        scale_label = tk.Label(frame1, text="Flight code")
         scale_combo = ttk.Combobox(frame1, font=self.default_font)
         self.comboboxes.append(scale_combo)
+        graph_button = tk.Button(frame1, text="Generate graph")
         mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
         settings = {"padx": 5, "pady": 5, "expand": True,
@@ -130,6 +136,7 @@ class VisualizerUI(tk.Tk):
         y_combo.pack(**settings)
         scale_label.pack(**settings)
         scale_combo.pack(**settings)
+        graph_button.pack(**settings)
         mode_select.pack(**settings, side=tk.LEFT)
         type_select.pack(**settings, side=tk.LEFT)
         statistic.pack(**settings, side=tk.LEFT)
@@ -200,6 +207,9 @@ class GraphManager(tk.Frame, Observer):
     def draw(self, logic):
         if self.type == 1:
             self.draw_dist_plot(logic.cur_df, logic.pair)
+        if self.type == 2:
+            self.draw_custom_plot(logic.cur_df, logic.graph_type,
+                                  logic.arguments)
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
@@ -208,8 +218,17 @@ class GraphManager(tk.Frame, Observer):
                           f" to {pair[1]}")
         self.ax.set_xlabel("price (rupee)")
         sns.histplot(data=data, x="price", log_scale=True,
-                               hue="class", ax=self.ax)
+                     hue="class", ax=self.ax)
         self.canvas.draw()
+
+    def draw_custom_plot(self, data, graph_type, args):
+        self.ax.clear()
+        if graph_type == "Histogram":
+            sns.histplot(data=data, **args, ax=self.ax)
+        elif graph_type == "Availability":
+            self.ax = data.plot.bar(rot=0)
+        self.canvas.draw()
+        pass
 
 
 if __name__ == "__main__":
