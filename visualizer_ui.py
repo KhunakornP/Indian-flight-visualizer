@@ -49,6 +49,7 @@ class VisualizerUI(tk.Tk):
         notebook.add(self.init_flight_search(), text=names[0])
         notebook.add(self.init_flight_planner(), text=names[1])
         notebook.add(self.init_data_summary(), text=names[2])
+        self.notebook = notebook
 
     def init_flight_search(self):
         """Initializes the flight search page"""
@@ -108,6 +109,7 @@ class VisualizerUI(tk.Tk):
                              label="mode:")
         type_select = Keypad(frame2, ["Distribution", "Scatter",
                                     "Pie chart"], label="Type:")
+        type_select["state"] = "disabled"
         graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
         statistic = tk.Text(frame2, font=self.default_font, width=60,
@@ -209,7 +211,7 @@ class GraphManager(tk.Frame, Observer):
             self.draw_dist_plot(logic.cur_df, logic.pair)
         if self.type == 2:
             self.draw_custom_plot(logic.cur_df, logic.graph_type,
-                                  logic.arguments)
+                                  logic.pair, logic.arguments)
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
@@ -221,12 +223,15 @@ class GraphManager(tk.Frame, Observer):
                      hue="class", ax=self.ax)
         self.canvas.draw()
 
-    def draw_custom_plot(self, data, graph_type, args):
+    def draw_custom_plot(self, data, graph_type, pair,args):
         self.ax.clear()
         if graph_type == "Histogram":
             sns.histplot(data=data, **args, ax=self.ax)
         elif graph_type == "Availability":
-            self.ax = data.plot.bar(rot=0)
+            self.ax.set_title(f"Flight availability from {pair[0]}"
+                              f" to {pair[1]}")
+            sns.countplot(data=data, x="departure_time", hue="arrival_time",
+                          ax=self.ax)
         self.canvas.draw()
         pass
 

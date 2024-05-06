@@ -45,8 +45,7 @@ class DataframeLogic(LogicSubject):
             observers.update_graph(self)
 
     def get_availability(self):
-        self.cur_df = self.cur_df.groupby(["departure_time",
-                                           "arrival_time"]).airline.count()
+        self.state = 2
         self.graph_type = "Availability"
         self.notify()
 

@@ -14,6 +14,7 @@ class Controller:
         self.bind_components()
 
     def bind_components(self):
+        self.main.notebook.bind("<<NotebookTabChanged>>", self.tab_load_graph)
         self.main.comboboxes[0].bind("<<ComboboxSelected>>",
                                      self.get_valid_destination)
         self.main.comboboxes[1].bind("<<ComboboxSelected>>",
@@ -74,3 +75,14 @@ class Controller:
         tk.messagebox.showerror("Value error",
                                 message="Invalid airport")
 
+    def tab_load_graph(self, event):
+        if event.widget.index("current") == 0:
+            self.logic.state = 1
+            update_thread = threading.Thread(target=self.logic.pair_city,
+                                             args=("Delhi", "Mumbai"))
+            update_thread.start()
+        elif event.widget.index("current") == 1:
+            self.logic.state = 2
+            update_thread = threading.Thread(target=
+                                             self.logic.get_availability)
+            update_thread.start()
