@@ -15,31 +15,44 @@ class Controller:
 
     def bind_components(self):
         self.main.notebook.bind("<<NotebookTabChanged>>", self.tab_load_graph)
-        self.main.comboboxes[0].bind("<<ComboboxSelected>>",
-                                     self.get_valid_destination)
+        for i in [0, 3]:
+            self.main.comboboxes[i].bind("<<ComboboxSelected>>",
+                                         self.get_valid_destination)
         self.main.comboboxes[1].bind("<<ComboboxSelected>>",
                                      self.update_dist_graph)
         self.main.comboboxes[2].bind("<<ComboboxSelected>>",
                                      self.get_price_analysis)
         self.main.comboboxes[2].bind("<Return>", self.get_price_analysis)
+        self.main.button.bind("<Button>", self.generate_graph)
 
     def get_combobox_values(self):
-        self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
-        self.main.comboboxes[0].current(newindex=0)
-        self.main.comboboxes[1]["values"] =\
-            self.logic.get_dest_airports("Delhi")
-        self.main.comboboxes[1].current(newindex=0)
+        for i in [0, 3]:
+            self.main.comboboxes[i]["values"] = self.logic.get_airport_names()
+            self.main.comboboxes[i].current(newindex=0)
+        for i in [1, 4]:
+            self.main.comboboxes[i]["values"] =\
+                self.logic.get_dest_airports("Delhi")
+            self.main.comboboxes[i].current(newindex=0)
         self.main.comboboxes[2]["values"] = self.logic.get_flight_codes()
+        self.main.comboboxes[5]["values"] = self.logic.get_flight_codes()
 
     def get_valid_destination(self, event):
         src = event.widget.get()
         if src not in self.valid_airports:
             self.raise_invalid_airport()
             return
-        self.main.comboboxes[1]["values"] = self.logic.get_dest_airports(src)
-        self.main.comboboxes[1].delete(0, "end")
-        self.main.comboboxes[2].delete(0, "end")
-        self.main.comboboxes[2].config(state="disabled")
+        index = self.main.comboboxes.index(event.widget)
+        if index == 0:
+            self.main.comboboxes[1]["values"] = (
+                self.logic.get_dest_airports(src))
+            self.main.comboboxes[1].delete(0, "end")
+            self.main.comboboxes[2].delete(0, "end")
+            self.main.comboboxes[2].config(state="disabled")
+        elif index == 3:
+            self.main.comboboxes[4]["values"] = (
+                self.logic.get_dest_airports(src))
+            self.main.comboboxes[4].delete(0, "end")
+            self.main.comboboxes[4].delete(0, "end")
 
     def get_default_graphs(self):
         for graphs in self.main.graphs:
@@ -86,3 +99,12 @@ class Controller:
             update_thread = threading.Thread(target=
                                              self.logic.get_availability)
             update_thread.start()
+
+    def generate_graph(self, event):
+        if self.main.mode.var.get() == 0:
+            src = self.main.comboboxes[3].get()
+            end = self.main.comboboxes[4].get()
+            update_thread = threading.Thread(
+                target=self.logic.pair_city(src, end))
+            update_thread.start()
+            self.logic.get_availability()

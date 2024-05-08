@@ -106,28 +106,29 @@ class VisualizerUI(tk.Tk):
         frame1 = tk.Frame(mainframe)
         mode_select = Keypad(frame2, ["Availability","Days booked",
                                     "Frequency", "By airport", "By pair"],
-                             label="mode:")
+                             label="mode:", radio=True)
+        self.mode = mode_select
         type_select = Keypad(frame2, ["Distribution", "Scatter",
-                                    "Pie chart"], label="Type:")
+                                    "Pie chart"], label="Type:", radio=True)
+        self.type = type_select
         type_select["state"] = "disabled"
         graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
         statistic = tk.Text(frame2, font=self.default_font, width=60,
                             wrap=tk.WORD)
-        statistic.insert("end", "Descriptive statistics to be added\n"
-                                "also graph doesn't work yet\n"
-                                "apologies for the inconvenience")
         mainframe.pack(fill="both", expand=True)
-        x_label = tk.Label(frame1, text="X axis:")
+        x_label = tk.Label(frame1, text="From:")
         x_combo = ttk.Combobox(frame1, font=self.default_font)
         self.comboboxes.append(x_combo)
-        y_label = tk.Label(frame1, text="Y axis:")
+        y_label = tk.Label(frame1, text="To:")
         y_combo = ttk.Combobox(frame1, font=self.default_font)
         self.comboboxes.append(y_combo)
         scale_label = tk.Label(frame1, text="Flight code")
         scale_combo = ttk.Combobox(frame1, font=self.default_font)
+        scale_combo.configure(state="disabled")
         self.comboboxes.append(scale_combo)
         graph_button = tk.Button(frame1, text="Generate graph")
+        self.button = graph_button
         mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
         settings = {"padx": 5, "pady": 5, "expand": True,
