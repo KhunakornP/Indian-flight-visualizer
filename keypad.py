@@ -4,23 +4,28 @@ import tkinter as tk
 class Keypad(tk.Frame):
     """A keypad widget for tkinter"""
 
-    def __init__(self, parent, keynames=[], label="", columns=1, **kwargs):
+    def __init__(self, parent, keynames=[], label="", columns=1,
+                 radio=False, **kwargs):
         super().__init__(parent, kwargs)
         self.keynames = keynames
-        self.init_components(columns, label)
+        if radio:
+            self.var = tk.IntVar()
+        self.init_components(columns, label, radio)
 
     @property
     def frame(self):
         """Getter for the keypad's frame"""
         return super()
 
-    def init_components(self, columns, label) -> None:
+    def init_components(self, columns, label, radio) -> None:
         """Create a keypad of keys using the keynames list.
         The first keyname is at the top left of the keypad and
         fills the available columns left-to-right, adding as many
         rows as needed.
         :param columns: number of columns to use
         :param label: A label for the keypad
+        :param radio: Determines whether the keypad uses regular buttons
+                      or Radio buttons
         """
         settings = {"padx": 2, "pady": 2, "sticky": tk.NSEW}
         if label:
@@ -28,14 +33,25 @@ class Keypad(tk.Frame):
             key_label.grid(column=0, row=0, sticky=tk.N)
         column = 0
         row = columns
-        for key in self.keynames:
-            button = tk.Button(self, text=key)
-            button.grid(column=column % columns, row=row // columns,
-                        **settings)
-            self.rowconfigure(row // columns, weight=1)
-            self.columnconfigure(column % columns, weight=1)
-            column += 1
-            row += 1
+        if radio:
+            for key in self.keynames:
+                button = tk.Radiobutton(self, text=key, variable=self.var,
+                                        value=column, indicatoron=False)
+                button.grid(column=column % columns, row=row // columns,
+                            **settings)
+                self.rowconfigure(row // columns, weight=1)
+                self.columnconfigure(column % columns, weight=1)
+                column += 1
+                row += 1
+        else:
+            for key in self.keynames:
+                button = tk.Button(self, text=key)
+                button.grid(column=column % columns, row=row // columns,
+                            **settings)
+                self.rowconfigure(row // columns, weight=1)
+                self.columnconfigure(column % columns, weight=1)
+                column += 1
+                row += 1
 
     def bind(self, sequence, func, add=''):
         """Bind an event handler to an event sequence."""
