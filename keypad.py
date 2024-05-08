@@ -84,7 +84,10 @@ class Keypad(tk.Frame):
         use `keypad.frame.configure()`.
         """
         for button in self.children.values():
-            button.configure(cnf, **kwargs)
+            if not isinstance(button, (tk.Button, tk.Radiobutton)):
+                pass
+            else:
+                button.configure(cnf, **kwargs)
 
     def set_button(self, index, key, value):
         """Configures a specific button in the keypad"""
