@@ -18,6 +18,7 @@ class VisualizerUI(tk.Tk):
         self.comboboxes = []
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.graphs = []
+        self.labels = []
         self.price_analysis = None
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
@@ -129,6 +130,9 @@ class VisualizerUI(tk.Tk):
         self.comboboxes.append(scale_combo)
         graph_button = tk.Button(frame1, text="Generate graph")
         self.button = graph_button
+        self.labels.append(x_label)
+        self.labels.append(y_label)
+        self.labels.append(scale_label)
         mainframe.grid_columnconfigure((0,1,2), uniform="1", weight=1)
         mainframe.grid_rowconfigure((0,1), uniform="1", weight=1)
         settings = {"padx": 5, "pady": 5, "expand": True,

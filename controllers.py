@@ -15,26 +15,25 @@ class Controller:
 
     def bind_components(self):
         self.main.notebook.bind("<<NotebookTabChanged>>", self.tab_load_graph)
-        for i in [0, 3]:
-            self.main.comboboxes[i].bind("<<ComboboxSelected>>",
-                                         self.get_valid_destination)
+        self.main.comboboxes[0].bind("<<ComboboxSelected>>",
+                                     self.get_valid_destination)
         self.main.comboboxes[1].bind("<<ComboboxSelected>>",
                                      self.update_dist_graph)
         self.main.comboboxes[2].bind("<<ComboboxSelected>>",
                                      self.get_price_analysis)
         self.main.comboboxes[2].bind("<Return>", self.get_price_analysis)
         self.main.button.bind("<Button>", self.generate_graph)
+        self.main.mode.configure(command=self.set_attribute_tab)
 
     def get_combobox_values(self):
-        for i in [0, 3]:
-            self.main.comboboxes[i]["values"] = self.logic.get_airport_names()
-            self.main.comboboxes[i].current(newindex=0)
-        for i in [1, 4]:
-            self.main.comboboxes[i]["values"] =\
-                self.logic.get_dest_airports("Delhi")
-            self.main.comboboxes[i].current(newindex=0)
+        self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
+        self.main.comboboxes[0].current(newindex=0)
+        self.main.comboboxes[1]["values"] =\
+            self.logic.get_dest_airports("Delhi")
+        self.main.comboboxes[1].current(newindex=0)
         self.main.comboboxes[2]["values"] = self.logic.get_flight_codes()
-        self.main.comboboxes[5]["values"] = self.logic.get_flight_codes()
+        for i in range(3,5):
+            self.main.comboboxes[i]["values"] = self.valid_airports
 
     def get_valid_destination(self, event):
         src = event.widget.get()
@@ -51,7 +50,6 @@ class Controller:
         elif index == 3:
             self.main.comboboxes[4]["values"] = (
                 self.logic.get_dest_airports(src))
-            self.main.comboboxes[4].delete(0, "end")
             self.main.comboboxes[4].delete(0, "end")
 
     def get_default_graphs(self):
@@ -96,9 +94,51 @@ class Controller:
             update_thread.start()
         elif event.widget.index("current") == 1:
             self.logic.state = 2
+            self.main.mode.children["!radiobutton"].invoke()
             update_thread = threading.Thread(target=
                                              self.logic.get_availability)
             update_thread.start()
+
+    def set_attribute_tab(self):
+        if self.main.mode.var.get() == 0:
+            self.main.type["state"] = "disabled"
+            self.main.labels[0]["text"] = "From:"
+            self.main.comboboxes[3].delete(0, "end")
+            self.main.labels[1]["text"] = "To:"
+            self.main.comboboxes[4].delete(0, "end")
+            self.main.comboboxes[5].config(state="disabled")
+        elif self.main.mode.var.get() == 1:
+            self.main.type["state"] = "disabled"
+            self.main.labels[0]["text"] = "From:"
+            self.main.comboboxes[3].delete(0, "end")
+            self.main.labels[1]["text"] = "To:"
+            self.main.comboboxes[4].delete(0, "end")
+            self.main.labels[2]["text"] = "Flight code"
+            self.main.comboboxes[5].config(state="enabled")
+        elif self.main.mode.var.get() == 2:
+            self.main.type["state"] = "disabled"
+            self.main.labels[0]["text"] = "x axis:"
+            self.main.comboboxes[3].delete(0, "end")
+            self.main.labels[1]["text"] = "y axis:"
+            self.main.comboboxes[4]["values"] = ["Frequency"]
+            self.main.comboboxes[4].current(newindex=0)
+            self.main.comboboxes[5].config(state="disabled")
+        elif self.main.mode.var.get() == 3:
+            self.main.type["state"] = "disabled"
+            self.main.labels[0]["text"] = "x axis:"
+            self.main.comboboxes[3]["values"] = ["Airport"]
+            self.main.comboboxes[3].current(newindex=0)
+            self.main.labels[1]["text"] = "y axis:"
+            self.main.comboboxes[4].delete(0, "end")
+            self.main.comboboxes[5].config(state="disabled")
+        elif self.main.mode.var.get() == 4:
+            self.main.labels[0]["text"] = "x axis:"
+            self.main.comboboxes[3].delete(0, "end")
+            self.main.labels[1]["text"] = "y axis:"
+            self.main.comboboxes[4].delete(0, "end")
+            self.main.labels[2]["text"] = "Group by"
+            self.main.comboboxes[5].config(state="enabled")
+            self.main.type["state"] = "active"
 
     def generate_graph(self, event):
         if self.main.mode.var.get() == 0:
