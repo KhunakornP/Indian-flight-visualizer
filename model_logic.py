@@ -30,6 +30,7 @@ class DataframeLogic(LogicSubject):
         self.eco = None
         self.business = None
         self.pair = ("Delhi", "Mumbai")
+        self.title = ""
         self.graph_type = "Histogram"
         self.arguments = {}
         self.pair_city("Delhi", "Mumbai")
@@ -52,6 +53,20 @@ class DataframeLogic(LogicSubject):
     def group_by(self, parameter, value):
         pass
 
+    def get_day_plot(self, flight_code):
+        self.pair_city(self.pair[0], self.pair[1])
+        self.cur_df = self.cur_df[self.cur_df.flight == flight_code]
+        self.state = 2
+        self.graph_type = "Scatter"
+        self.arguments = {"x":"days_left", "y":"price", "hue":"class"}
+        self.title = (f"Scatter plot of price and days booked before flight of"
+                      f" flight {flight_code}")
+        self.notify()
+
+    def get_price_graph(self, source, end):
+        self.pair_city(source, end)
+        self.notify()
+
     def pair_city(self, source, end):
         """
         Groups the data by city pair
@@ -67,7 +82,6 @@ class DataframeLogic(LogicSubject):
         self.pair = (source, end)
         self.eco = self.cur_df[self.cur_df["class"] == "Economy"]
         self.business = self.cur_df[self.cur_df["class"] == "Business"]
-        self.notify()
 
     def get_flight_info(self, flight_code):
         df = self.orig_df[self.orig_df["flight"] == flight_code]

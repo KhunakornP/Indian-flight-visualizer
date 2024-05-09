@@ -216,7 +216,7 @@ class GraphManager(tk.Frame, Observer):
             self.draw_dist_plot(logic.cur_df, logic.pair)
         if self.type == 2:
             self.draw_custom_plot(logic.cur_df, logic.graph_type,
-                                  logic.pair, logic.arguments)
+                                  logic.pair, logic.arguments, logic.title)
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
@@ -228,7 +228,7 @@ class GraphManager(tk.Frame, Observer):
                      hue="class", ax=self.ax)
         self.canvas.draw()
 
-    def draw_custom_plot(self, data, graph_type, pair,args):
+    def draw_custom_plot(self, data, graph_type, pair,args, title):
         self.ax.clear()
         if graph_type == "Histogram":
             sns.histplot(data=data, **args, ax=self.ax)
@@ -237,6 +237,9 @@ class GraphManager(tk.Frame, Observer):
                               f" to {pair[1]}")
             sns.countplot(data=data, x="departure_time", hue="arrival_time",
                           ax=self.ax)
+        elif graph_type == "Scatter":
+            self.ax.set_title(title)
+            sns.scatterplot(data=data, **args, ax=self.ax)
         self.canvas.draw()
         pass
 

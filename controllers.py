@@ -24,6 +24,8 @@ class Controller:
         self.main.comboboxes[2].bind("<Return>", self.get_price_analysis)
         self.main.button.bind("<Button>", self.generate_graph)
         self.main.mode.configure(command=self.set_attribute_tab)
+        self.main.comboboxes[4].bind("<<ComboboxSelected>>",
+                                     self.temp_get_flight_codes)
 
     def get_combobox_values(self):
         self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
@@ -65,7 +67,8 @@ class Controller:
                 return
             self.main.comboboxes[2].config(state="active")
             self.main.comboboxes[2].delete(0, "end")
-            update_thread = threading.Thread(target=self.logic.pair_city(src, event.widget.get()))
+            update_thread = threading.Thread(target=self.logic.get_price_graph(
+                src, event.widget.get()))
             update_thread.start()
             self.main.comboboxes[2]["values"] = self.logic.get_flight_codes()
 
@@ -103,9 +106,10 @@ class Controller:
         if self.main.mode.var.get() == 0:
             self.main.type["state"] = "disabled"
             self.main.labels[0]["text"] = "From:"
-            self.main.comboboxes[3].delete(0, "end")
             self.main.labels[1]["text"] = "To:"
-            self.main.comboboxes[4].delete(0, "end")
+            for i in range(3,5):
+                self.main.comboboxes[i]["values"] = self.valid_airports
+                self.main.comboboxes[i].delete(0, "end")
             self.main.comboboxes[5].config(state="disabled")
         elif self.main.mode.var.get() == 1:
             self.main.type["state"] = "disabled"
@@ -148,3 +152,15 @@ class Controller:
                 target=self.logic.pair_city(src, end))
             update_thread.start()
             self.logic.get_availability()
+        elif self.main.mode.var.get() == 1:
+            flight = self.main.comboboxes[5].get()
+            self.logic.get_day_plot(flight)
+
+    def temp_get_flight_codes(self, event):
+        """Note don't forget to move everything to state pattern"""
+        if self.main.mode.var.get() == 1:
+            src = self.main.comboboxes[3].get()
+            end = event.widget.get()
+            self.logic.graph_type = "Scatter"
+            self.logic.pair_city(src, end)
+            self.main.comboboxes[5]["values"] = self.logic.get_flight_codes()
