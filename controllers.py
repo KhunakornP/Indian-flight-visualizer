@@ -92,15 +92,11 @@ class Controller:
     def tab_load_graph(self, event):
         if event.widget.index("current") == 0:
             self.logic.state = 1
-            update_thread = threading.Thread(target=self.logic.pair_city,
-                                             args=("Delhi", "Mumbai"))
-            update_thread.start()
+            self.logic.pair_city("Delhi", "Mumbai")
         elif event.widget.index("current") == 1:
             self.logic.state = 2
             self.main.mode.children["!radiobutton"].invoke()
-            update_thread = threading.Thread(target=
-                                             self.logic.get_availability)
-            update_thread.start()
+            self.logic.get_availability()
 
     def set_attribute_tab(self):
         if self.main.mode.var.get() == 0:
@@ -125,15 +121,19 @@ class Controller:
         elif self.main.mode.var.get() == 2:
             self.main.type["state"] = "disabled"
             self.main.labels[0]["text"] = "x axis:"
+            self.main.comboboxes[3]["values"] = (
+                self.logic.get_countable_attributes())
             self.main.comboboxes[3].delete(0, "end")
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4]["values"] = ["Frequency"]
             self.main.comboboxes[4].current(newindex=0)
             self.main.comboboxes[5].config(state="disabled")
+            self.main.type["state"] = "active"
+            self.main.type.set_button(2,"state","disabled")
         elif self.main.mode.var.get() == 3:
             self.main.type["state"] = "disabled"
             self.main.labels[0]["text"] = "x axis:"
-            self.main.comboboxes[3]["values"] = ["Airport"]
+            self.main.comboboxes[3]["values"] = ["Airline"]
             self.main.comboboxes[3].current(newindex=0)
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4].delete(0, "end")
@@ -158,6 +158,10 @@ class Controller:
         elif self.main.mode.var.get() == 1:
             flight = self.main.comboboxes[5].get()
             self.logic.get_day_plot(flight)
+        elif self.main.mode.var.get() == 2:
+            var = self.main.comboboxes[3].get()
+            graph = self.main.type.var.get()
+            self.logic.get_frequency_plot(var, graph)
 
     def temp_get_flight_codes(self, event):
         """Note don't forget to move everything to state pattern"""

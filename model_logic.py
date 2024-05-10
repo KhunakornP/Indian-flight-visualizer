@@ -66,6 +66,31 @@ class DataframeLogic(LogicSubject):
                       f" flight {flight_code if flight_code else 'not found'}")
         self.notify()
 
+    def get_frequency_plot(self, attribute, graph=1):
+        self.state = 2
+        self.cur_df = self.orig_df.copy()
+        if graph < 2:
+            self.arguments = {"x":attribute}
+            self.title = f"Histogram of {attribute}"
+            self.graph_type = "Count"
+            if attribute in ["duration", "days_left"]:
+                self.arguments["binwidth"] = 2
+                self.graph_type = "Histogram"
+        elif graph == 2:
+            if attribute in ["duration", "days_left"]:
+                self.title = f"Histogram of {attribute}"
+                self.arguments = {"x": attribute, "binwidth": 2}
+                self.graph_type = "Histogram"
+                self.notify()
+                return
+            self.cur_df = self.cur_df.groupby(attribute).count()
+            self.arguments = {"labels":self.cur_df.index.to_list(),
+                              "x":self.cur_df.columns[1]}
+            self.title = (f"Distribution of {attribute} from total number of "
+                          f"{attribute}")
+            self.graph_type = "Pie"
+        self.notify()
+
     def get_price_graph(self, source, end):
         self.pair_city(source, end)
         self.notify()
@@ -215,16 +240,12 @@ class DataframeLogic(LogicSubject):
         """
         return self.cur_df.flight.unique().tolist()
 
+    def get_countable_attributes(self):
+        return [x for x in list(self.orig_df.columns) if x not in ["flight",
+                                                                   "price"]]
+
 
 if __name__ == "__main__":
     test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
                                        "Indian Airlines.csv")))
-    test.pair_city("Delhi", "Mumbai")
-    print(test.cur_df.head().source_city)
-    print(test.cur_df.head().destination_city)
-    print(test.get_stop_analysis(2))
-    print(test.get_flight_info("AI-803"))
-    print(test.generate_price_analysis("AI-803"))
-    print(test.get_average_cost_per_dist(24))
-    test.get_availability()
-    print(test.cur_df["Afternoon"])
+    print(test.get_frequency_plot("airline", 2))
