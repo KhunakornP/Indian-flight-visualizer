@@ -19,7 +19,7 @@ class VisualizerUI(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.graphs = []
         self.labels = []
-        self.price_analysis = None
+        self.text_boxes = []
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(family="Times", size=22)
         self.init_components()
@@ -61,13 +61,14 @@ class VisualizerUI(tk.Tk):
         text_label = tk.Label(frame3, text="Price analysis", anchor=tk.N)
         text_label.pack(expand=True, fill='both')
         scrollbar = tk.Scrollbar(frame3)
-        self.price_analysis = tk.Text(frame3, font=self.default_font,
-                                      width=0, height=20, wrap=tk.WORD,
-                                      yscrollcommand=scrollbar.set)
+        price_analysis = tk.Text(frame3, font=self.default_font,
+                                  width=0, height=20, wrap=tk.WORD,
+                                  yscrollcommand=scrollbar.set)
         scrollbar.pack(side=tk.RIGHT, fill="y")
-        scrollbar.configure(command=self.price_analysis.yview)
-        self.price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
-        self.price_analysis.configure(state="disabled")
+        scrollbar.configure(command=price_analysis.yview)
+        price_analysis.pack(expand=True, fill="both", padx=10, pady=5)
+        price_analysis.configure(state="disabled")
+        self.text_boxes.append(price_analysis)
         placeholder = GraphManager(frame2)
         self.graphs.append(placeholder)
         placeholder.pack(expand=True, fill="both", anchor=tk.CENTER)
@@ -117,6 +118,10 @@ class VisualizerUI(tk.Tk):
         self.graphs.append(graph)
         statistic = tk.Text(frame2, font=self.default_font, width=60,
                             wrap=tk.WORD)
+        scrollbar = tk.Scrollbar(frame2)
+        scrollbar.pack(side=tk.RIGHT, fill="y")
+        scrollbar.configure(command=statistic.yview)
+        self.text_boxes.append(statistic)
         mainframe.pack(fill="both", expand=True)
         x_label = tk.Label(frame1, text="From:")
         x_combo = ttk.Combobox(frame1, font=self.default_font)

@@ -77,11 +77,11 @@ class Controller:
             if self.main.comboboxes[i].get() == "":
                 return
         flight = event.widget.get()
-        self.main.price_analysis.config(state="normal")
-        self.main.price_analysis.delete(1.0, "end")
-        self.main.price_analysis.insert(tk.END,
-                                        self.logic.generate_price_analysis(flight))
-        self.main.price_analysis.config(state="disabled")
+        self.main.text_boxes[0].config(state="normal")
+        self.main.text_boxes[0].delete(1.0, "end")
+        self.main.text_boxes[0].insert(tk.END,
+                                    self.logic.generate_price_analysis(flight))
+        self.main.text_boxes[0].config(state="disabled")
 
     def raise_invalid_airport(self):
         for i in range(1):
@@ -168,6 +168,8 @@ class Controller:
                 target=self.logic.pair_city(src, end))
             update_thread.start()
             self.logic.get_availability()
+            self.main.text_boxes[1].insert(tk.END,
+                                           self.logic.describe_statistics())
         elif self.main.mode.var.get() == 1:
             flight = self.main.comboboxes[5].get()
             self.logic.get_day_plot(flight)

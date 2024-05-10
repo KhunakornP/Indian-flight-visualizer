@@ -45,6 +45,43 @@ class DataframeLogic(LogicSubject):
         for observers in self._observers:
             observers.update_graph(self)
 
+    def describe_statistics(self, mode=1):
+        if mode == 1:
+            string = self.cur_df.groupby(
+                "departure_time").flight.count().to_string()
+            string = string.splitlines()
+            if len(string) < 2:
+                return "No Departure data"
+            string[0] = string[0] + " number of departures"
+            description = ""
+            # I really should have used a monospaced font
+            padding = ["    ", "           ", "   ",
+                       "              ",
+                       "         ","             ","                  "]
+            count = 0
+            for strings in string:
+                split = strings.split(maxsplit=1)
+                description += split[0] + padding[count] + split[1]+"\n"
+                count += 1
+            return description
+        elif mode == 2:
+            eco_values = list(self.eco["price"].describe().values)
+            bus_values = list(self.business["price"].describe().values)
+            if len(eco_values) < 1:
+                eco_values = [0,0,0,0]
+            if len(bus_values) < 1:
+                bus_values = [0,0,0,0]
+            description = (f"Economy class price statistics:\n"
+                           f"Mean: {eco_values[1]:.2f} rupees\n"
+                           f"Min: {eco_values[3]:.2f} rupees\n"
+                           f"Max: {eco_values[-1]:.2f} rupees\n"
+                           f"\nBusiness class price statistics:\n"
+                           f"Mean: {bus_values[1]:.2f} rupees\n"
+                           f"Min: {bus_values[3]:.2f} rupees\n"
+                           f"Max: {bus_values[-1]:.2f} rupees")
+            return description
+
+
     def get_correlation_graph(self, var1, var2):
         self.state = 2
         self.graph_type = "Scatter"
@@ -274,7 +311,5 @@ class DataframeLogic(LogicSubject):
 if __name__ == "__main__":
     test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
                                        "Indian Airlines.csv")))
-    print(test.get_countable_attributes())
-    print(test.get_frequency_plot("airline", 2))
-    print(test.get_all_attributes())
-    print(test.get_numerical_attributes())
+
+    print(test.describe_statistics(1))
