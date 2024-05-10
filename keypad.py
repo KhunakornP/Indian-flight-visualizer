@@ -94,7 +94,7 @@ class Keypad(tk.Frame):
         if index == 1:
             index = ""
         for button in self.children.keys():
-            if button == f"!button{index}":
+            if button in [f"!button{index}", f"!radiobutton{index}"]:
                 self.children[button][key] = value
                 return
 
