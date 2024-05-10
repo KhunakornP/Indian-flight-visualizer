@@ -45,7 +45,7 @@ class DataframeLogic(LogicSubject):
         for observers in self._observers:
             observers.update_graph(self)
 
-    def describe_statistics(self, mode=1):
+    def describe_statistics(self,flight="", mode=1):
         if mode == 1:
             string = self.cur_df.groupby(
                 "departure_time").flight.count().to_string()
@@ -65,12 +65,10 @@ class DataframeLogic(LogicSubject):
                 count += 1
             return description
         elif mode == 2:
-            eco_values = list(self.eco["price"].describe().values)
-            bus_values = list(self.business["price"].describe().values)
-            if len(eco_values) < 1:
-                eco_values = [0,0,0,0]
-            if len(bus_values) < 1:
-                bus_values = [0,0,0,0]
+            eco = self.eco[self.eco.flight == flight]
+            business = self.business[self.business.flight == flight]
+            eco_values = list(eco["price"].describe().values)
+            bus_values = list(business["price"].describe().values)
             description = (f"Economy class price statistics:\n"
                            f"Mean: {eco_values[1]:.2f} rupees\n"
                            f"Min: {eco_values[3]:.2f} rupees\n"
@@ -80,13 +78,66 @@ class DataframeLogic(LogicSubject):
                            f"Min: {bus_values[3]:.2f} rupees\n"
                            f"Max: {bus_values[-1]:.2f} rupees")
             return description
+        elif mode == 3:
+            return "No statistics available"
+        elif mode == 4:
+            df = self.orig_df[self.orig_df["class"] == "Economy"]
+            airlines = df.airline.unique().tolist()
+            description = f"Economy class price statistics:\n"
+            for airline in airlines:
+                cur_df = df[df.airline == airline]
+                values = list(cur_df["price"].describe().values)
+                describe = (f"\n*Price statistics for {airline}*\n"
+                            f"Mean: {values[1]:.2f} rupees\n"
+                            f"Min: {values[3]:.2f} rupees\n"
+                            f"Max: {values[-1]:.2f} rupees\n")
+                description += describe
+            return description
+        elif mode == 5:
+            df = self.orig_df[self.orig_df["class"] == "Business"]
+            airlines = df.airline.unique().tolist()
+            description = f"Business class price statistics:\n"
+            for airline in airlines:
+                cur_df = df[df.airline == airline]
+                values = list(cur_df["price"].describe().values)
+                describe = (f"\n*Price statistics for {airline}*\n"
+                            f"Mean: {values[1]:.2f} rupees\n"
+                            f"Min: {values[3]:.2f} rupees\n"
+                            f"Max: {values[-1]:.2f} rupees\n")
+                description += describe
+            return description
+        elif mode == 6:
+            cor = self.orig_df[self.pair[0]].corr(self.orig_df[self.pair[1]])
+            description = (f"{self.pair[0]} and {self.pair[1]} has a\n"
+                           f"correlation coefficient of {cor:.2f}\n")
+            if cor < 0:
+                relation = "negative"
+            else:
+                relation = "positive"
+            if abs(cor) < 0.2:
+                modifier = "very weak/negligible"
+            elif abs(cor) < 0.4:
+                modifier = "weak"
+            elif abs(cor) < 0.6:
+                modifier = "moderate"
+            elif abs(cor) < 0.8:
+                modifier = "strong"
+            else:
+                modifier = "Very strong"
+            if cor == 1:
+                desc_relation = "because they are the same attribute"
+            else:
+                desc_relation = (f"which is considered to be a {modifier} "
+                                 f"{relation} relation")
+            return description + desc_relation
+
 
 
     def get_correlation_graph(self, var1, var2):
         self.state = 2
         self.graph_type = "Scatter"
-        self.title = (f"Scatter plot of {var1 if var1 else 'nothing'} and "
-                      f"{var2 if var2 else 'nothing'}")
+        self.pair = (var1, var2)
+        self.title = f"Scatter plot of {var1} and {var2}"
         self.arguments = {"x":var1, "y":var2}
         self.notify()
 

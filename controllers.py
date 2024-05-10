@@ -40,7 +40,7 @@ class Controller:
     def get_valid_destination(self, event):
         src = event.widget.get()
         if src not in self.valid_airports:
-            self.raise_invalid_airport()
+            self.raise_invalid_message("Invalid airport")
             return
         index = self.main.comboboxes.index(event.widget)
         if index == 0:
@@ -63,7 +63,7 @@ class Controller:
         if event.widget.get() != "":
             src = self.main.comboboxes[0].get()
             if src not in self.valid_airports:
-                self.raise_invalid_airport()
+                self.raise_invalid_message("Invalid airport")
                 return
             self.main.comboboxes[2].config(state="active")
             self.main.comboboxes[2].delete(0, "end")
@@ -83,11 +83,11 @@ class Controller:
                                     self.logic.generate_price_analysis(flight))
         self.main.text_boxes[0].config(state="disabled")
 
-    def raise_invalid_airport(self):
+    def raise_invalid_message(self, msg):
         for i in range(1):
             self.main.comboboxes[i].delete(0, "end")
         tk.messagebox.showerror("Value error",
-                                message="Invalid airport")
+                                message=msg)
 
     def tab_load_graph(self, event):
         if event.widget.index("current") == 0:
@@ -168,22 +168,56 @@ class Controller:
                 target=self.logic.pair_city(src, end))
             update_thread.start()
             self.logic.get_availability()
+            self.main.text_boxes[1].config(state="normal")
+            self.main.text_boxes[1].delete(1.0, "end")
             self.main.text_boxes[1].insert(tk.END,
                                            self.logic.describe_statistics())
+            self.main.text_boxes[1].config(state="disabled")
         elif self.main.mode.var.get() == 1:
             flight = self.main.comboboxes[5].get()
             self.logic.get_day_plot(flight)
+            self.main.text_boxes[1].config(state="normal")
+            self.main.text_boxes[1].delete(1.0, "end")
+            self.main.text_boxes[1].insert(
+                tk.END, self.logic.describe_statistics(flight,2))
+            self.main.text_boxes[1].config(state="disabled")
         elif self.main.mode.var.get() == 2:
             var = self.main.comboboxes[3].get()
+            if var not in self.main.comboboxes[3]["values"]:
+                self.raise_invalid_message("Invalid attribute")
+                return
             graph = self.main.type.var.get()
             self.logic.get_frequency_plot(var, graph)
+            self.main.text_boxes[1].config(state="normal")
+            self.main.text_boxes[1].delete(1.0, "end")
+            self.main.text_boxes[1].insert(
+                tk.END, self.logic.describe_statistics(mode=3))
+            self.main.text_boxes[1].config(state="disabled")
         elif self.main.mode.var.get() == 3:
             tier = self.main.comboboxes[4].get()
             self.logic.get_airline_graph(tier)
+            self.main.text_boxes[1].config(state="normal")
+            self.main.text_boxes[1].delete(1.0, "end")
+            if tier == "Economy":
+                self.main.text_boxes[1].insert(
+                    tk.END, self.logic.describe_statistics(mode=4))
+            elif tier == "Business":
+                self.main.text_boxes[1].insert(
+                    tk.END, self.logic.describe_statistics(mode=5))
+            self.main.text_boxes[1].config(state="disabled")
         elif self.main.mode.var.get() == 4:
             var1 = self.main.comboboxes[3].get()
             var2 = self.main.comboboxes[4].get()
+            if var1 not in self.main.comboboxes[3]["values"]:
+                self.raise_invalid_message("Invalid attribute")
+            if var2 not in self.main.comboboxes[4]["values"]:
+                self.raise_invalid_message("Invalid attribute")
             self.logic.get_correlation_graph(var1, var2)
+            self.main.text_boxes[1].config(state="normal")
+            self.main.text_boxes[1].delete(1.0, "end")
+            self.main.text_boxes[1].insert(
+                tk.END, self.logic.describe_statistics(mode=6))
+            self.main.text_boxes[1].config(state="disabled")
 
     def temp_get_combobox_values(self, event):
         """Note don't forget to move everything to state pattern"""

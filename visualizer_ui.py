@@ -116,9 +116,9 @@ class VisualizerUI(tk.Tk):
         type_select["state"] = "disabled"
         graph = GraphManager(mainframe, 2)
         self.graphs.append(graph)
-        statistic = tk.Text(frame2, font=self.default_font, width=60,
-                            wrap=tk.WORD)
         scrollbar = tk.Scrollbar(frame2)
+        statistic = tk.Text(frame2, font=self.default_font, width=60,
+                            wrap=tk.WORD, yscrollcommand=scrollbar.set)
         scrollbar.pack(side=tk.RIGHT, fill="y")
         scrollbar.configure(command=statistic.yview)
         self.text_boxes.append(statistic)
@@ -221,7 +221,7 @@ class GraphManager(tk.Frame, Observer):
             self.draw_dist_plot(logic.cur_df, logic.pair)
         if self.type == 2:
             self.draw_custom_plot(logic.cur_df, logic.graph_type,
-                                  logic.pair, logic.arguments, logic.title)
+                                  logic.arguments, logic.title)
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
@@ -233,7 +233,7 @@ class GraphManager(tk.Frame, Observer):
                      hue="class", ax=self.ax)
         self.canvas.draw()
 
-    def draw_custom_plot(self, data, graph_type, pair,args, title):
+    def draw_custom_plot(self, data, graph_type,args, title):
         self.canvas.figure.clear()
         self.ax = self.canvas.figure.subplots()
         self.ax.set_title(title)
