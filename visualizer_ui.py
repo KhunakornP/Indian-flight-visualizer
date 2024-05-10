@@ -245,7 +245,6 @@ class GraphManager(tk.Frame, Observer):
         elif graph_type == "Box":
             sns.boxplot(data=data, **args, ax=self.ax)
         self.canvas.draw()
-        pass
 
 
 if __name__ == "__main__":

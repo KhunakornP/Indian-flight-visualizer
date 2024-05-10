@@ -45,6 +45,14 @@ class DataframeLogic(LogicSubject):
         for observers in self._observers:
             observers.update_graph(self)
 
+    def get_correlation_graph(self, var1, var2):
+        self.state = 2
+        self.graph_type = "Scatter"
+        self.title = (f"Scatter plot of {var1 if var1 else 'nothing'} and "
+                      f"{var2 if var2 else 'nothing'}")
+        self.arguments = {"x":var1, "y":var2}
+        self.notify()
+
     def get_availability(self):
         self.state = 2
         self.graph_type = "Count"
@@ -258,6 +266,10 @@ class DataframeLogic(LogicSubject):
     def get_flight_class(self):
         return self.orig_df["class"].unique().tolist()
 
+    def get_numerical_attributes(self):
+        return self.orig_df.select_dtypes(include=["int64",
+                                                   "float64"]).columns.tolist()
+
 
 if __name__ == "__main__":
     test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
@@ -265,3 +277,4 @@ if __name__ == "__main__":
     print(test.get_countable_attributes())
     print(test.get_frequency_plot("airline", 2))
     print(test.get_all_attributes())
+    print(test.get_numerical_attributes())

@@ -118,6 +118,7 @@ class Controller:
             self.main.comboboxes[4].delete(0, "end")
             self.main.labels[2]["text"] = "Flight code"
             self.main.comboboxes[5].config(state="enabled")
+            self.main.comboboxes[5].delete(0, "end")
         elif self.main.mode.var.get() == 2:
             self.main.type["state"] = "disabled"
             self.main.labels[0]["text"] = "x axis:"
@@ -127,8 +128,10 @@ class Controller:
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4]["values"] = ["Frequency"]
             self.main.comboboxes[4].current(newindex=0)
+            self.main.comboboxes[5].delete(0, "end")
             self.main.comboboxes[5].config(state="disabled")
             self.main.type["state"] = "active"
+            self.main.type.children["!radiobutton"].invoke()
             self.main.type.set_button(2,"state","disabled")
         elif self.main.mode.var.get() == 3:
             self.main.type["state"] = "disabled"
@@ -138,6 +141,7 @@ class Controller:
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4].delete(0, "end")
             self.main.comboboxes[4]["values"] = self.logic.get_flight_class()
+            self.main.comboboxes[5].delete(0, "end")
             self.main.comboboxes[5].config(state="disabled")
         elif self.main.mode.var.get() == 4:
             self.main.labels[0]["text"] = "x axis:"
@@ -147,11 +151,13 @@ class Controller:
             self.main.labels[2]["text"] = "Group by"
             for i in range(3,5):
                 self.main.comboboxes[i]["values"] =(
-                    self.logic.get_all_attributes()
+                    self.logic.get_numerical_attributes()
                 )
-            self.main.comboboxes[5].config(state="enabled")
+            self.main.comboboxes[5].delete(0, "end")
+            self.main.comboboxes[5].config(state="disabled")
             self.main.type["state"] = "active"
             self.main.type.set_button(1, "state", "disabled")
+            self.main.type.children["!radiobutton2"].invoke()
             self.main.type.set_button(3, "state", "disabled")
 
     def generate_graph(self, event):
@@ -172,6 +178,10 @@ class Controller:
         elif self.main.mode.var.get() == 3:
             tier = self.main.comboboxes[4].get()
             self.logic.get_airline_graph(tier)
+        elif self.main.mode.var.get() == 4:
+            var1 = self.main.comboboxes[3].get()
+            var2 = self.main.comboboxes[4].get()
+            self.logic.get_correlation_graph(var1, var2)
 
     def temp_get_combobox_values(self, event):
         """Note don't forget to move everything to state pattern"""
