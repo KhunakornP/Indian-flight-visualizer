@@ -25,7 +25,7 @@ class Controller:
         self.main.button.bind("<Button>", self.generate_graph)
         self.main.mode.configure(command=self.set_attribute_tab)
         self.main.comboboxes[4].bind("<<ComboboxSelected>>",
-                                     self.temp_get_flight_codes)
+                                     self.temp_get_combobox_values)
 
     def get_combobox_values(self):
         self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
@@ -137,6 +137,7 @@ class Controller:
             self.main.comboboxes[3].current(newindex=0)
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4].delete(0, "end")
+            self.main.comboboxes[4]["values"] = self.logic.get_flight_class()
             self.main.comboboxes[5].config(state="disabled")
         elif self.main.mode.var.get() == 4:
             self.main.labels[0]["text"] = "x axis:"
@@ -144,8 +145,14 @@ class Controller:
             self.main.labels[1]["text"] = "y axis:"
             self.main.comboboxes[4].delete(0, "end")
             self.main.labels[2]["text"] = "Group by"
+            for i in range(3,5):
+                self.main.comboboxes[i]["values"] =(
+                    self.logic.get_all_attributes()
+                )
             self.main.comboboxes[5].config(state="enabled")
             self.main.type["state"] = "active"
+            self.main.type.set_button(1, "state", "disabled")
+            self.main.type.set_button(3, "state", "disabled")
 
     def generate_graph(self, event):
         if self.main.mode.var.get() == 0:
@@ -162,8 +169,11 @@ class Controller:
             var = self.main.comboboxes[3].get()
             graph = self.main.type.var.get()
             self.logic.get_frequency_plot(var, graph)
+        elif self.main.mode.var.get() == 3:
+            tier = self.main.comboboxes[4].get()
+            self.logic.get_airline_graph(tier)
 
-    def temp_get_flight_codes(self, event):
+    def temp_get_combobox_values(self, event):
         """Note don't forget to move everything to state pattern"""
         if self.main.mode.var.get() == 1:
             src = self.main.comboboxes[3].get()
@@ -171,3 +181,5 @@ class Controller:
             self.logic.graph_type = "Scatter"
             self.logic.pair_city(src, end)
             self.main.comboboxes[5]["values"] = self.logic.get_flight_codes()
+        elif self.main.mode.var.get() == 3:
+            self.main.comboboxes[5]["values"] = []

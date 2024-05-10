@@ -48,13 +48,21 @@ class DataframeLogic(LogicSubject):
     def get_availability(self):
         self.state = 2
         self.graph_type = "Count"
-        self.title = (f"Flight availability from {self.pair[0]} to "
-                      f"{self.pair[1]}")
+        src = self.pair[0] if self.pair[0] else "nowhere"
+        end = self.pair[1] if self.pair[1] else "nowhere"
+        self.title = (f"Flight availability from {src} to "
+                      f"{end}")
         self.arguments = {"x":"departure_time", "hue":"arrival_time"}
         self.notify()
 
-    def group_by(self, parameter, value):
-        pass
+    def get_airline_graph(self, tier):
+        self.cur_df = self.orig_df.copy()
+        self.cur_df = self.cur_df[self.cur_df["class"] == tier]
+        self.title = (f"{tier if tier else 'Unknown class'}"
+                      f" ticket Price distribution grouped by airlines")
+        self.arguments = {"x":"airline", "y":"price", "showfliers":False}
+        self.graph_type = "Box"
+        self.notify()
 
     def get_day_plot(self, flight_code):
         self.pair_city(self.pair[0], self.pair[1])
@@ -244,8 +252,16 @@ class DataframeLogic(LogicSubject):
         return [x for x in list(self.orig_df.columns) if x not in ["flight",
                                                                    "price"]]
 
+    def get_all_attributes(self):
+        return self.orig_df.columns.to_list()
+
+    def get_flight_class(self):
+        return self.orig_df["class"].unique().tolist()
+
 
 if __name__ == "__main__":
     test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
                                        "Indian Airlines.csv")))
+    print(test.get_countable_attributes())
     print(test.get_frequency_plot("airline", 2))
+    print(test.get_all_attributes())

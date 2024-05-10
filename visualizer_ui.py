@@ -106,7 +106,7 @@ class VisualizerUI(tk.Tk):
         frame2 = tk.Frame(mainframe)
         frame1 = tk.Frame(mainframe)
         mode_select = Keypad(frame2, ["Availability","Days booked",
-                                    "Frequency", "By airline", "By pair"],
+                                    "Frequency", "By airline", "Correlation"],
                              label="mode:", radio=True)
         self.mode = mode_select
         type_select = Keypad(frame2, ["Distribution", "Scatter",
@@ -231,20 +231,19 @@ class GraphManager(tk.Frame, Observer):
     def draw_custom_plot(self, data, graph_type, pair,args, title):
         self.canvas.figure.clear()
         self.ax = self.canvas.figure.subplots()
+        self.ax.set_title(title)
         if graph_type == "Histogram":
-            self.ax.set_title(title)
             sns.histplot(data=data, **args, ax=self.ax)
             if "binwidth" in args:
                 self.ax.set_xticks(range(0,51, 2))
         elif graph_type == "Count":
-            self.ax.set_title(title)
             sns.countplot(data=data, **args, ax=self.ax)
         elif graph_type == "Scatter":
-            self.ax.set_title(title)
             sns.scatterplot(data=data, **args, ax=self.ax)
         elif graph_type == "Pie":
-            self.ax.set_title(title)
             self.ax.pie(data=data, **args, autopct=f'%.1f%%', startangle=0)
+        elif graph_type == "Box":
+            sns.boxplot(data=data, **args, ax=self.ax)
         self.canvas.draw()
         pass
 
