@@ -232,11 +232,9 @@ class GraphManager(tk.Frame, Observer):
         self.ax.clear()
         if graph_type == "Histogram":
             sns.histplot(data=data, **args, ax=self.ax)
-        elif graph_type == "Availability":
-            self.ax.set_title(f"Flight availability from {pair[0]}"
-                              f" to {pair[1]}")
-            sns.countplot(data=data, x="departure_time", hue="arrival_time",
-                          ax=self.ax)
+        elif graph_type == "Count":
+            self.ax.set_title(title)
+            sns.countplot(data=data, **args, ax=self.ax)
         elif graph_type == "Scatter":
             self.ax.set_title(title)
             sns.scatterplot(data=data, **args, ax=self.ax)

@@ -115,6 +115,9 @@ class Controller:
             self.main.type["state"] = "disabled"
             self.main.labels[0]["text"] = "From:"
             self.main.comboboxes[3].delete(0, "end")
+            for i in range(3,5):
+                self.main.comboboxes[i]["values"] = self.valid_airports
+                self.main.comboboxes[i].delete(0, "end")
             self.main.labels[1]["text"] = "To:"
             self.main.comboboxes[4].delete(0, "end")
             self.main.labels[2]["text"] = "Flight code"

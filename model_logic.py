@@ -47,7 +47,10 @@ class DataframeLogic(LogicSubject):
 
     def get_availability(self):
         self.state = 2
-        self.graph_type = "Availability"
+        self.graph_type = "Count"
+        self.title = (f"Flight availability from {self.pair[0]} to "
+                      f"{self.pair[1]}")
+        self.arguments = {"x":"departure_time", "hue":"arrival_time"}
         self.notify()
 
     def group_by(self, parameter, value):
@@ -60,7 +63,7 @@ class DataframeLogic(LogicSubject):
         self.graph_type = "Scatter"
         self.arguments = {"x":"days_left", "y":"price", "hue":"class"}
         self.title = (f"Scatter plot of price and days booked before flight of"
-                      f" flight {flight_code}")
+                      f" flight {flight_code if flight_code else 'not found'}")
         self.notify()
 
     def get_price_graph(self, source, end):
