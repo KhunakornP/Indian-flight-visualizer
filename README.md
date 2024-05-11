@@ -10,9 +10,9 @@ Airline, number of stops and time of day on the price of the flight.
 ### screenshots
 | Page                                         | Screenshot                      |
 |----------------------------------------------|---------------------------------|
-| Flight search                                | ![src1](./screenshots/src1.jpg) |
-| Flight planner                               | ![src2](./screenshots/src2.jpg) |
-| Data summary                                 | ![src7](./screenshots/src7.jpg) |
+| Flight search                                | ![src1](./screenshots/src1.JPG) |
+| Flight planner                               | ![src2](./screenshots/src2.JPG) |
+| Data summary                                 | ![src7](./screenshots/src7.JPG) |
 
 ### Installation
 - clone the repository
