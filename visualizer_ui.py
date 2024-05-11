@@ -166,23 +166,31 @@ class VisualizerUI(tk.Tk):
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")
         graph_select = ttk.Combobox(frame1,font=self.default_font)
+        next_button = tk.Button(frame1, text="Next page")
+        prev_button = tk.Button(frame1, text="Previous")
         self.comboboxes.append(graph_select)
+        scrollbar = tk.Scrollbar(frame2)
         sum_label = tk.Label(frame2, text="Exploration:")
-        sum_text = tk.Text(frame2)
-        settings = {"pady": 5, "expand": True, "fill": "both"}
-        graph_label.pack(**settings, anchor=tk.N)
-        graph_select.pack(expand=True, fill="both", pady=200
-                          , anchor=tk.CENTER)
-        sum_label.pack(**settings)
+        sum_text = tk.Text(frame2, wrap=tk.WORD, font=self.default_font,
+                           yscrollcommand=scrollbar.set, width=35, height=0)
+        scrollbar.pack(side=tk.RIGHT, fill="y")
+        scrollbar.configure(command=sum_text.yview)
+        self.text_boxes.append(sum_text)
+        settings = {"pady": 5, "padx":5, "expand": True, "fill": "both"}
+        graph_label.pack(**settings, side=tk.LEFT)
+        graph_select.pack(expand=True, fill="both", side=tk.LEFT)
+        prev_button.pack(**settings, side=tk.LEFT)
+        next_button.pack(**settings, side=tk.LEFT)
+        sum_label.pack(anchor=tk.N)
         sum_text.pack(**settings)
         mainframe.grid_columnconfigure((0, 1, 2, 3, 4, 5),
                                        uniform="1", weight=1)
-        mainframe.grid_rowconfigure((0, 1), uniform="1", weight=1)
+        mainframe.grid_rowconfigure((0, 1, 2, 3), uniform="1", weight=1)
         settings = {"padx": 5, "pady": 5}
-        frame1.grid(row=0, column=0, sticky="nsew", rowspan=2, **settings)
-        placeholder.grid(row=0, column=1, sticky="nsew", rowspan=2, columnspan=3,
+        frame1.grid(row=3, column=0, sticky="nsew", columnspan=6, **settings)
+        placeholder.grid(row=0, column=0, sticky="nsew", rowspan=3, columnspan=3,
                     **settings)
-        frame2.grid(row=0, column=4, sticky="nsew", rowspan=2, columnspan=2,
+        frame2.grid(row=0, column=3, sticky="nsew", rowspan=3, columnspan=3,
                     **settings)
         mainframe.pack(fill="both", expand=True)
         return mainframe
@@ -219,9 +227,11 @@ class GraphManager(tk.Frame, Observer):
     def draw(self, logic):
         if self.type == 1:
             self.draw_dist_plot(logic.cur_df, logic.pair)
-        if self.type == 2:
+        elif self.type == 2:
             self.draw_custom_plot(logic.cur_df, logic.graph_type,
                                   logic.arguments, logic.title)
+        elif self.type == 3:
+            self.draw_summary_plot(logic.orig_df, logic.index)
 
     def draw_dist_plot(self, data, pair):
         """Draw the graph from the dataframe"""
@@ -249,6 +259,51 @@ class GraphManager(tk.Frame, Observer):
             self.ax.pie(data=data, **args, autopct=f'%.1f%%', startangle=0)
         elif graph_type == "Box":
             sns.boxplot(data=data, **args, ax=self.ax)
+        self.canvas.draw()
+
+    def draw_summary_plot(self, data, index):
+        self.canvas.figure.clear()
+        self.ax = self.canvas.figure.subplots()
+        if index == 0:
+            airlines = []
+            for airline in list(data.airline.unique()):
+                air_data = data[data.airline == airline]
+                airlines.append(air_data)
+            colors = ["r", "g", "b", 'y', 'pink', 'purple']
+            sorted_a = []
+            for airline in airlines:
+                dfs = airline.groupby("stops").price.mean()
+                sorted_a.append(dfs)
+            for airlines in sorted_a:
+                if airlines.shape[0] < 3:
+                    airlines.loc[2] = 0
+            bottom = 0
+            for i in range(6):
+                self.ax.bar(["0", "1", "2"], sorted_a[i], color=colors[i],
+                            bottom=bottom)
+                bottom += sorted_a[i]
+            self.ax.autoscale()
+            self.ax.legend(list(data.airline.unique()))
+            self.ax.set_xlabel("stops")
+            self.ax.set_ylabel("price")
+            self.ax.set_title("Mean price of flights by number of stops by"
+                              " airline")
+        elif index == 1:
+            data = data[data["class"] == "Economy"]
+            sns.scatterplot(data=data, x="days_left", y="price", ax=self.ax)
+            self.ax.set_xlabel("days booked before flight")
+            self.ax.set_ylabel("price")
+            self.ax.set_title("Scatter plot of days booked before flight and"
+                              " price for Economy tickets")
+        elif index == 2:
+            data = data[data["class"] == "Economy"]
+            data = data.groupby(["departure_time","arrival_time"]).price.mean()
+            data.unstack().plot.bar(ax=self.ax)
+            self.ax.set(ylim=(3000, 9000))
+            self.ax.set_title("Economy ticket price distribution by departure "
+                              "and arrival time")
+            self.ax.set_xlabel("departure time")
+            self.ax.set_ylabel("price")
         self.canvas.draw()
 
 
