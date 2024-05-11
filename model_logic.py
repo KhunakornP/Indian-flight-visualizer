@@ -5,6 +5,7 @@ import os
 
 
 class LogicSubject(abc.ABC):
+    """An Interface for the DataFrameLogic"""
     @abc.abstractmethod
     def attach(self, observer):
         """Attach an observer to the model"""
@@ -22,6 +23,7 @@ class LogicSubject(abc.ABC):
 
 
 class DataframeLogic(LogicSubject):
+    """The logic for the visualizer"""
     _observers: list[Observer] = []
     def __init__(self, df):
         self.state = 1
@@ -37,24 +39,34 @@ class DataframeLogic(LogicSubject):
         self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
+        """Attach an observer to the model"""
         self._observers.append(observer)
 
     def detach(self, observer):
+        """Detach an observer from the model"""
         self._observers.remove(observer)
 
     def notify(self):
+        """Notify a change in the model"""
         for observers in self._observers:
             observers.update_graph(self)
 
     def increase_index(self):
+        """Increase the index counter by 1"""
         if self.index < 2:
             self.index += 1
 
     def lower_index(self):
+        """Deceases the index counter by 1"""
         if self.index > 0:
             self.index -= 1
 
     def get_summary_text(self):
+        """
+        Gets a summary of the data
+
+        :return: A string for data story telling
+        """
         if self.index == 0:
             return ("from the graph we can see that flights with only 1 "
                     "stops\nare more expensive on average than flights with 0 "
@@ -86,6 +98,11 @@ class DataframeLogic(LogicSubject):
                     "average cost \nof 4784.70 rupees")
 
     def get_summary_graph(self, index=-1):
+        """
+        Notify observers to draw a summary graph
+
+        :param index: An integer to choose which graph to draw
+        """
         self.state = 3
         current = self.index
         if index in range(4):
@@ -94,6 +111,13 @@ class DataframeLogic(LogicSubject):
         self.index = current
 
     def describe_statistics(self,flight="", mode=1):
+        """
+        Generates some statistics depending on the mode provided
+
+        :param flight: optional. A string of a flight code
+        :param mode: optional. An integer to choose which description to return
+        :return: A formatted string for a description of the data
+        """
         if mode == 1:
             string = self.cur_df.groupby(
                 "departure_time").flight.count().to_string()
@@ -179,9 +203,13 @@ class DataframeLogic(LogicSubject):
                                  f"{relation} relation")
             return description + desc_relation
 
-
-
     def get_correlation_graph(self, var1, var2):
+        """
+        Notify observers to draw a correlation graph
+
+        :param var1: A string representing an attribute to use as the x-axis
+        :param var2: A sting representing an attribute to use as the y-axis
+        """
         self.state = 2
         self.cur_df = self.orig_df.copy()
         self.graph_type = "Scatter"
@@ -191,6 +219,7 @@ class DataframeLogic(LogicSubject):
         self.notify()
 
     def get_availability(self):
+        """Notify observers to draw an availability graph"""
         self.state = 2
         self.graph_type = "Count"
         src = self.pair[0] if self.pair[0] else "nowhere"
@@ -201,6 +230,11 @@ class DataframeLogic(LogicSubject):
         self.notify()
 
     def get_airline_graph(self, tier):
+        """
+        Notify observers to draw a box plot for the flight planner page
+
+        :param tier: A string representing the ticket class
+        """
         self.cur_df = self.orig_df.copy()
         self.cur_df = self.cur_df[self.cur_df["class"] == tier]
         self.title = (f"{tier if tier else 'Unknown class'}"
@@ -210,6 +244,11 @@ class DataframeLogic(LogicSubject):
         self.notify()
 
     def get_day_plot(self, flight_code):
+        """
+        Notify observers to draw a scatter plot for the flight planner page
+
+        :param flight_code: A string of a flight-code to query the data with
+        """
         self.pair_city(self.pair[0], self.pair[1])
         self.cur_df = self.cur_df[self.cur_df.flight == flight_code]
         self.state = 2
@@ -220,6 +259,14 @@ class DataframeLogic(LogicSubject):
         self.notify()
 
     def get_frequency_plot(self, attribute, graph=1):
+        """
+        Notify observers to draw a plot of frequency for the flight planner
+        page.
+
+        :param attribute: A string representing an attribute to count in
+        the dataframe.
+        :param graph: An integer to select which type of graph to draw
+        """
         self.state = 2
         self.cur_df = self.orig_df.copy()
         if graph < 2:
@@ -245,6 +292,12 @@ class DataframeLogic(LogicSubject):
         self.notify()
 
     def get_price_graph(self, source, end):
+        """
+        Notify observers to draw a histogram for the flight search page
+
+        :param source: A string representing the departure airport
+        :param end: A string representing the arrival airport
+        """
         self.pair_city(source, end)
         self.notify()
 
@@ -265,6 +318,11 @@ class DataframeLogic(LogicSubject):
         self.business = self.cur_df[self.cur_df["class"] == "Business"]
 
     def get_flight_info(self, flight_code):
+        """
+        Gets information about the flight
+
+        :param flight_code: A string of a flight code to search the dataframe
+        """
         df = self.orig_df[self.orig_df["flight"] == flight_code]
         if len(df) == 0:
             return None, None, None, None, None, None, None
@@ -283,6 +341,12 @@ class DataframeLogic(LogicSubject):
         return airline, stops, start, end, price, duration, f_class
 
     def generate_price_analysis(self, flight_code):
+        """
+        Generates an analysis on the price of a flight
+
+        :param flight_code: A string of a flight code to search the dataframe
+        :return: A string of the analysis
+        """
         (airline, stops, start, end,
          price, dur, f_class) = self.get_flight_info(flight_code)
         if airline is None:
@@ -319,6 +383,12 @@ class DataframeLogic(LogicSubject):
         return statistic
 
     def get_airline_analysis(self, airline):
+        """
+        Gets an analysis on airlines in the current dataframe
+
+        :param airline: A string of an airline to search the dataframe with
+        :return: A string of the analysis
+        """
         price_median = self.cur_df.price.mean()
         airline_median = self.cur_df.groupby("airline").price.mean()
         airline_med_price = airline_median[airline]
@@ -332,6 +402,13 @@ class DataframeLogic(LogicSubject):
                 f"more expensive flights compared to similar flights.\n")
 
     def get_stop_analysis(self, stops):
+        """
+        Gets an analysis on the number of stops in the current dataframe
+
+        :param stops: An integer of number of stops
+        to search the dataframe with
+        :return: A string of the analysis
+        """
         price_median = self.cur_df.price.mean()
         stop_median = self.cur_df.groupby("stops").price.mean()
         stop_med_price = stop_median[stops]
@@ -346,6 +423,13 @@ class DataframeLogic(LogicSubject):
                 f"similar flights.\n")
 
     def get_time_analysis(self, dep_time, end_time):
+        """
+        Gets an analysis on the number of stops in the current dataframe
+
+        :param dep_time: A string of the departure time to search the dataframe
+        :param end_time: A string of the arrival time to search the dataframe
+        :return: A string of the analysis
+        """
         sorted_df = self.cur_df[self.cur_df.departure_time == dep_time]
         price_median = sorted_df.price.mean()
         time_median = sorted_df.groupby("arrival_time").price.mean()
@@ -361,6 +445,13 @@ class DataframeLogic(LogicSubject):
                 f"similar flights.\n")
 
     def get_average_cost_per_dist(self, duration):
+        """
+        Gets an analysis of the average cost of fights within
+        a range of distances in the dataframe
+
+        :param duration: An integer to group flights with similar duration
+        :return: A string of the analysis
+        """
         time = int(duration)
         df = self.orig_df[self.orig_df["class"] == 'Economy']
         sorted_df = df[(df.duration >= time) &
@@ -368,9 +459,6 @@ class DataframeLogic(LogicSubject):
         med_price = sorted_df.price.mean()
         return (f"A flight with a duration of {duration} hours\n"
                 f"on average costs {med_price:.2f} rupees\n")
-
-    def get_data_summary(self, page):
-        pass
 
     def get_airport_names(self):
         """
@@ -382,6 +470,11 @@ class DataframeLogic(LogicSubject):
         return cities.tolist()
 
     def get_dest_airports(self, start):
+        """
+        Gets the destination airports of the current dataframe
+
+        :return: A list of destination airports in the dataframe
+        """
         cities = self.orig_df[self.orig_df.source_city == start]
         return cities.destination_city.unique().tolist()
 
@@ -394,27 +487,36 @@ class DataframeLogic(LogicSubject):
         return self.cur_df.flight.unique().tolist()
 
     def get_countable_attributes(self):
+        """
+        Gets all countable attributes in the dataframe
+
+        :return: A list of strings of countable attributes in the dataframe
+        """
         return [x for x in list(self.orig_df.columns) if x not in ["flight",
                                                                    "price"]]
 
     def get_all_attributes(self):
+        """
+        Gets all attributes in the dataframe
+
+        :return: A list of strings of all attributes in the dataframe
+        """
         return self.orig_df.columns.to_list()
 
     def get_flight_class(self):
+        """
+        Gets all ticket classes in the dataframe
+
+        :return: A list of strings of all ticket classes in the dataframe
+        """
+
         return self.orig_df["class"].unique().tolist()
 
     def get_numerical_attributes(self):
+        """
+        Gets all numerical attributes in the dataframe
+
+        :return: A list of strings of all numerical attributes in the dataframe
+        """
         return self.orig_df.select_dtypes(include=["int64",
                                                    "float64"]).columns.tolist()
-
-
-if __name__ == "__main__":
-    test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
-                                       "Indian Airlines.csv")))
-
-    df = test.orig_df
-    df = df[df["class"] == "Economy"]
-    print(df["price"].corr(df["days_left"]))
-    df = test.orig_df
-    df = df[df["class"] == "Business"]
-    print(df["price"].corr(df["days_left"]))

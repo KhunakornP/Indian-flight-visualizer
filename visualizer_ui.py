@@ -5,7 +5,6 @@ import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot as plt
 import seaborn as sns
-import pandas as pd
 from keypad import Keypad
 matplotlib.use("TkAgg")
 
@@ -202,6 +201,7 @@ class VisualizerUI(tk.Tk):
 
 
 class Observer(abc.ABC):
+    """An interface for the GraphManager"""
     @abc.abstractmethod
     def update_graph(self, logic):
         """Receive an update from the model"""
@@ -216,16 +216,23 @@ class GraphManager(tk.Frame, Observer):
         self.init_components()
 
     def init_components(self):
+        """Initializes the graph components"""
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(figure=self.fig, master=self)
         self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH,
                                          expand=True)
 
     def update_graph(self, logic):
+        """Updates the graph if the model is in the same state as the graph"""
         if self.type == logic.state:
             self.draw(logic)
 
     def draw(self, logic):
+        """
+        Draws the graph depending on the graph's type
+
+        :param logic: A dataframe object for plotting
+        """
         if self.type == 1:
             self.draw_dist_plot(logic.cur_df, logic.pair)
         elif self.type == 2:
@@ -235,7 +242,12 @@ class GraphManager(tk.Frame, Observer):
             self.draw_summary_plot(logic.orig_df, logic.index)
 
     def draw_dist_plot(self, data, pair):
-        """Draw the graph from the dataframe"""
+        """
+        Draw the graph from the dataframe
+
+        :param data: A dataframe object to plot
+        :param pair: A tuple of strings to use in the title
+        """
         self.ax.clear()
         self.ax.set_title(f"price distribution of flights from {pair[0]}"
                           f" to {pair[1]}")
@@ -245,6 +257,14 @@ class GraphManager(tk.Frame, Observer):
         self.canvas.draw()
 
     def draw_custom_plot(self, data, graph_type,args, title):
+        """
+        Draw a non-predetermined graph on the canvas
+
+        :param data: A dataframe object to plot
+        :param graph_type: A string denoting the type of graph to plot
+        :param args: A dictionary of arguments to plot the graph with
+        :param title: A string for the graph title
+        """
         self.canvas.figure.clear()
         self.ax = self.canvas.figure.subplots()
         self.ax.set_title(title)
@@ -263,6 +283,12 @@ class GraphManager(tk.Frame, Observer):
         self.canvas.draw()
 
     def draw_summary_plot(self, data, index):
+        """
+        Draw the corresponding graph for the summary page
+
+        :param data: A dataframe object to plot
+        :param index: An integer to choose which graph to plot
+        """
         self.canvas.figure.clear()
         self.ax = self.canvas.figure.subplots()
         if index == 0:
@@ -306,8 +332,3 @@ class GraphManager(tk.Frame, Observer):
             self.ax.set_xlabel("departure time")
             self.ax.set_ylabel("price")
         self.canvas.draw()
-
-
-if __name__ == "__main__":
-    f = VisualizerUI()
-    f.run()
