@@ -44,7 +44,7 @@ class VisualizerUI(tk.Tk):
 
     def init_notebook(self):
         """Initializes the notebook"""
-        notebook = ttk.Notebook(self,width=1000, height=600)
+        notebook = ttk.Notebook(self,width=1500, height=900)
         notebook.pack(pady=10, expand=True, anchor=tk.N, fill="both")
         names = ["Flight search", "Flight planner", "Data summary"]
         notebook.add(self.init_flight_search(), text=names[0])
