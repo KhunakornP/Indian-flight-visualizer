@@ -7,6 +7,13 @@ shows factors which affects flight price. As well as graphs of flight
 price data to show the correlation between factors such as
 Airline, number of stops and time of day on the price of the flight.
 
+### screenshots
+| Page                                         | Screenshot                      |
+|----------------------------------------------|---------------------------------|
+| Flight search                                | ![src1](./screenshots/src1.jpg) |
+| Flight planner                               | ![src2](./screenshots/src2.jpg) |
+| Data summary                                 | ![src7](./screenshots/src7.jpg) |
+
 ### Installation
 - Install or have python installed on your device
 - Clone this repository
