@@ -50,7 +50,6 @@ class DataframeLogic(LogicSubject):
         if self.index < 2:
             self.index += 1
 
-
     def lower_index(self):
         if self.index > 0:
             self.index -= 1
@@ -180,6 +179,7 @@ class DataframeLogic(LogicSubject):
 
     def get_correlation_graph(self, var1, var2):
         self.state = 2
+        self.cur_df = self.orig_df.copy()
         self.graph_type = "Scatter"
         self.pair = (var1, var2)
         self.title = f"Scatter plot of {var1} and {var2}"
