@@ -1,7 +1,7 @@
 """Controllers for the visualizer's UI"""
 import tkinter as tk
-from tkinter import messagebox
 import threading
+from tkinter import messagebox
 import abc
 
 
@@ -236,10 +236,11 @@ class AvailabilityState(ControllerState):
         self.controller.main.text_boxes[1].config(state="disabled")
 
     def update_component_values(self):
-        pass
+        """Refer to ControllerState.update_component_values"""
 
 
 class DayState(ControllerState):
+    """The days_left state of the controller"""
     def __init__(self, controler):
         self.controller = controler
 
@@ -279,6 +280,7 @@ class DayState(ControllerState):
 
 
 class FrequencyState(ControllerState):
+    """The frequency state of the controller"""
     def __init__(self, controller):
         self.controller = controller
 
@@ -314,10 +316,10 @@ class FrequencyState(ControllerState):
 
     def update_component_values(self):
         """Refer to ControllerState.update_component_values"""
-        pass
 
 
 class AirlineState(ControllerState):
+    """The by airline state of the controller"""
     def __init__(self, controller):
         self.controller = controller
 
@@ -350,10 +352,10 @@ class AirlineState(ControllerState):
 
     def update_component_values(self):
         """Refer to ControllerState.update_component_values"""
-        pass
 
 
 class CorrelationState(ControllerState):
+    """The correlation state of the controller"""
     def __init__(self, controller):
         self.controller = controller
 
@@ -392,4 +394,3 @@ class CorrelationState(ControllerState):
 
     def update_component_values(self):
         """Refer to ControllerState.update_component_values"""
-        pass

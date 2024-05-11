@@ -1,7 +1,6 @@
+"""Logic for the visualizer"""
 import abc
 from visualizer_ui import Observer
-import pandas as pd
-import os
 
 
 class LogicSubject(abc.ABC):
@@ -74,7 +73,7 @@ class DataframeLogic(LogicSubject):
                     "Air asia on average provides the cheapest flights and\n"
                     "Vistara on average provides the most expensive flights.\n"
                     )
-        elif self.index == 1:
+        if self.index == 1:
             return ("from the plot we can see that there is a big jump in "
                     "price between booking the flight 20 days and 10 days\n"
                     "before the flight date. So when booking a flight it is\n"
@@ -84,7 +83,7 @@ class DataframeLogic(LogicSubject):
                     "days is\n-0.55 which means that the more days between "
                     "booking the flight and departure date.\n The cheaper "
                     "the ticket price will become\n")
-        elif self.index == 2:
+        if self.index == 2:
             return ("From the graph we can see that the cheapest time "
                     "interval\n on average for ticket price are flights "
                     "from late night to\nearly morning followed by night to"
@@ -155,7 +154,7 @@ class DataframeLogic(LogicSubject):
         elif mode == 4:
             df = self.orig_df[self.orig_df["class"] == "Economy"]
             airlines = df.airline.unique().tolist()
-            description = f"Economy class price statistics:\n"
+            description = "Economy class price statistics:\n"
             for airline in airlines:
                 cur_df = df[df.airline == airline]
                 values = list(cur_df["price"].describe().values)
@@ -168,7 +167,7 @@ class DataframeLogic(LogicSubject):
         elif mode == 5:
             df = self.orig_df[self.orig_df["class"] == "Business"]
             airlines = df.airline.unique().tolist()
-            description = f"Business class price statistics:\n"
+            description = "Business class price statistics:\n"
             for airline in airlines:
                 cur_df = df[df.airline == airline]
                 values = list(cur_df["price"].describe().values)
@@ -202,6 +201,7 @@ class DataframeLogic(LogicSubject):
                 desc_relation = (f"which is considered to be a {modifier} "
                                  f"{relation} relation")
             return description + desc_relation
+        return ""
 
     def get_correlation_graph(self, var1, var2):
         """
@@ -375,10 +375,10 @@ class DataframeLogic(LogicSubject):
                         f"{self.pair[0]} to {self.pair[1]}.\nThe price "
                         f"of the flight is influenced by the following "
                         f"factors:\n")
-        analysis += f"\nDuration: " + duration
-        analysis += f"\nAirline: " + airline
-        analysis += f"\nNumber of stops: " + stop
-        analysis += f"\nTime of day: " + time
+        analysis += "\nDuration: " + duration
+        analysis += "\nAirline: " + airline
+        analysis += "\nNumber of stops: " + stop
+        analysis += "\nTime of day: " + time
         statistic += analysis
         return statistic
 

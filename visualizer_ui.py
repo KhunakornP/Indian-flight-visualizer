@@ -1,3 +1,4 @@
+"""UI for the visualizer"""
 import abc
 import tkinter as tk
 from tkinter import ttk, font
@@ -277,7 +278,7 @@ class GraphManager(tk.Frame, Observer):
         elif graph_type == "Scatter":
             sns.scatterplot(data=data, **args, ax=self.ax)
         elif graph_type == "Pie":
-            self.ax.pie(data=data, **args, autopct=f'%.1f%%', startangle=0)
+            self.ax.pie(data=data, **args, autopct='%.1f%%', startangle=0)
         elif graph_type == "Box":
             sns.boxplot(data=data, **args, ax=self.ax)
         self.canvas.draw()
