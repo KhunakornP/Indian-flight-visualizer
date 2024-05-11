@@ -15,9 +15,15 @@ Airline, number of stops and time of day on the price of the flight.
 | Data summary                                 | ![src7](./screenshots/src7.jpg) |
 
 ### Installation
-- Install or have python installed on your device
-- Clone this repository
-
+- clone the repository
+```
+https://github.com/KhunakornP/Indian-flight-visualizer.git
+```
+- navigate to the directory
+```
+cd Indian-flight-visualizer
+```
+#### See [Installation](https://github.com/KhunakornP/Indian-flight-visualizer/wiki/Installation-instructions) for more information
 ### How to run the program
 1. Create a virtual environment (Optional)
 ```
