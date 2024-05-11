@@ -166,8 +166,8 @@ class VisualizerUI(tk.Tk):
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")
         graph_select = ttk.Combobox(frame1,font=self.default_font)
-        next_button = tk.Button(frame1, text="Next page")
-        prev_button = tk.Button(frame1, text="Previous")
+        self.next_button = tk.Button(frame1, text="Next page")
+        self.prev_button = tk.Button(frame1, text="Previous")
         self.comboboxes.append(graph_select)
         scrollbar = tk.Scrollbar(frame2)
         sum_label = tk.Label(frame2, text="Exploration:")
@@ -179,8 +179,8 @@ class VisualizerUI(tk.Tk):
         settings = {"pady": 5, "padx":5, "expand": True, "fill": "both"}
         graph_label.pack(**settings, side=tk.LEFT)
         graph_select.pack(expand=True, fill="both", side=tk.LEFT)
-        prev_button.pack(**settings, side=tk.LEFT)
-        next_button.pack(**settings, side=tk.LEFT)
+        self.prev_button.pack(**settings, side=tk.LEFT)
+        self.next_button.pack(**settings, side=tk.LEFT)
         sum_label.pack(anchor=tk.N)
         sum_text.pack(**settings)
         mainframe.grid_columnconfigure((0, 1, 2, 3, 4, 5),
@@ -298,7 +298,7 @@ class GraphManager(tk.Frame, Observer):
         elif index == 2:
             data = data[data["class"] == "Economy"]
             data = data.groupby(["departure_time","arrival_time"]).price.mean()
-            data.unstack().plot.bar(ax=self.ax)
+            data.unstack().plot.bar(ax=self.ax, rot=0)
             self.ax.set(ylim=(3000, 9000))
             self.ax.set_title("Economy ticket price distribution by departure "
                               "and arrival time")

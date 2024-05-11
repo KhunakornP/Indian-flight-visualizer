@@ -26,6 +26,8 @@ class Controller:
         self.main.mode.configure(command=self.set_attribute_tab)
         self.main.comboboxes[4].bind("<<ComboboxSelected>>",
                                      self.temp_get_combobox_values)
+        self.main.prev_button.bind("<Button>", self.prev_summary_page)
+        self.main.next_button.bind("<Button>", self.next_summary_page)
 
     def get_combobox_values(self):
         self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
@@ -36,6 +38,24 @@ class Controller:
         self.main.comboboxes[2]["values"] = self.logic.get_flight_codes()
         for i in range(3,5):
             self.main.comboboxes[i]["values"] = self.valid_airports
+
+    def prev_summary_page(self, event):
+        self.logic.lower_index()
+        self.main.text_boxes[2].config(state="normal")
+        self.main.text_boxes[2].delete(1.0, "end")
+        self.main.text_boxes[2].insert(
+            tk.END, self.logic.get_summary_text())
+        self.main.text_boxes[2].config(state="disabled")
+        self.logic.get_summary_graph()
+
+    def next_summary_page(self, event):
+        self.logic.increase_index()
+        self.main.text_boxes[2].config(state="normal")
+        self.main.text_boxes[2].delete(1.0, "end")
+        self.main.text_boxes[2].insert(
+            tk.END, self.logic.get_summary_text())
+        self.main.text_boxes[2].config(state="disabled")
+        self.logic.get_summary_graph()
 
     def get_valid_destination(self, event):
         src = event.widget.get()
@@ -97,6 +117,11 @@ class Controller:
             self.logic.state = 2
             self.main.mode.children["!radiobutton"].invoke()
             self.logic.get_availability()
+        elif event.widget.index("current") == 2:
+            self.logic.state = 3
+            self.logic.get_summary_graph()
+            self.main.text_boxes[2].insert(
+                tk.END, self.logic.get_summary_text())
 
     def set_attribute_tab(self):
         if self.main.mode.var.get() == 0:

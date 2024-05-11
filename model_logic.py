@@ -33,6 +33,7 @@ class DataframeLogic(LogicSubject):
         self.title = ""
         self.graph_type = "Histogram"
         self.arguments = {}
+        self.index = 0
         self.pair_city("Delhi", "Mumbai")
 
     def attach(self, observer):
@@ -44,6 +45,50 @@ class DataframeLogic(LogicSubject):
     def notify(self):
         for observers in self._observers:
             observers.update_graph(self)
+
+    def increase_index(self):
+        if self.index < 2:
+            self.index += 1
+
+
+    def lower_index(self):
+        if self.index > 0:
+            self.index -= 1
+
+    def get_summary_text(self):
+        if self.index == 0:
+            return ("from the graph we can see that flights with only 1 "
+                    "stops\nare more expensive on average than flights with 0 "
+                    "or 2+ stops\n"
+                    "Air asia on average provides the cheapest flights and\n"
+                    "Vistara on average provides the most expensive flights.\n"
+                    )
+        elif self.index == 1:
+            return ("from the plot we can see that there is a big jump in"
+                    "price between booking the flight 20 days and 10 days\n"
+                    "before the flight date. So when booking a flight it is\n"
+                    "recommended to book the flight at least 16 days in "
+                    "advance\nfor the best prices.\n"
+                    "The correlation Coefficient between price and no. of "
+                    "days is\n-0.55 which means that the more days between "
+                    "booking the flight and departure date.\n The cheaper "
+                    "the ticket price will become\n")
+        elif self.index == 2:
+            return ("From the graph we can see that the cheapest time "
+                    "interval\n on average for ticket price are flights "
+                    "from late night to\nearly morning followed by night to"
+                    " late night and both\nlate night to late night and "
+                    "early morning to early morning\nthe most expensive "
+                    "flights are flights which have long durations\n(eg. early"
+                    " morning to late night). Flights that depart during\n"
+                    "morning on average have the highest cost with an average "
+                    "cost\nof 7119.02 rupees and flights that depart duning "
+                    "late night\non average have the cheapest cost with an "
+                    "average cost \nof 4784.70 rupees")
+
+    def get_summary_graph(self):
+        self.state = 3
+        self.notify()
 
     def describe_statistics(self,flight="", mode=1):
         if mode == 1:
@@ -363,4 +408,9 @@ if __name__ == "__main__":
     test = DataframeLogic(pd.read_csv(os.path.join(os.getcwd(), "Datasets",
                                        "Indian Airlines.csv")))
 
-    print(test.describe_statistics(1))
+    df = test.orig_df
+    df = df[df["class"] == "Economy"]
+    print(df["price"].corr(df["days_left"]))
+    df = test.orig_df
+    df = df[df["class"] == "Business"]
+    print(df["price"].corr(df["days_left"]))
