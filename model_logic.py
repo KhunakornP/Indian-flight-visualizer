@@ -63,7 +63,7 @@ class DataframeLogic(LogicSubject):
                     "Vistara on average provides the most expensive flights.\n"
                     )
         elif self.index == 1:
-            return ("from the plot we can see that there is a big jump in"
+            return ("from the plot we can see that there is a big jump in "
                     "price between booking the flight 20 days and 10 days\n"
                     "before the flight date. So when booking a flight it is\n"
                     "recommended to book the flight at least 16 days in "
@@ -85,9 +85,13 @@ class DataframeLogic(LogicSubject):
                     "late night\non average have the cheapest cost with an "
                     "average cost \nof 4784.70 rupees")
 
-    def get_summary_graph(self):
+    def get_summary_graph(self, index=-1):
         self.state = 3
+        current = self.index
+        if index in range(4):
+            self.index = index
         self.notify()
+        self.index = current
 
     def describe_statistics(self,flight="", mode=1):
         if mode == 1:

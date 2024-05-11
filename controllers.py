@@ -27,12 +27,14 @@ class Controller:
         self.main.comboboxes[2].bind("<<ComboboxSelected>>",
                                      self.get_price_analysis)
         self.main.comboboxes[2].bind("<Return>", self.get_price_analysis)
-        self.main.button.bind("<Button>", self.generate_graph)
+        self.main.button.bind("<ButtonRelease>", self.generate_graph)
         self.main.mode.configure(command=self.set_attribute_tab)
         self.main.comboboxes[4].bind("<<ComboboxSelected>>",
                                      self.temp_get_combobox_values)
-        self.main.prev_button.bind("<Button>", self.prev_summary_page)
-        self.main.next_button.bind("<Button>", self.next_summary_page)
+        self.main.prev_button.bind("<ButtonRelease>", self.prev_summary_page)
+        self.main.next_button.bind("<ButtonRelease>", self.next_summary_page)
+        self.main.comboboxes[6].bind("<<ComboboxSelected>>",
+                                     self.get_summary_graph)
 
     def get_combobox_values(self):
         self.main.comboboxes[0]["values"] = self.logic.get_airport_names()
@@ -61,6 +63,9 @@ class Controller:
             tk.END, self.logic.get_summary_text())
         self.main.text_boxes[2].config(state="disabled")
         self.logic.get_summary_graph()
+
+    def get_summary_graph(self, event):
+        self.logic.get_summary_graph(event.widget.current())
 
     def get_valid_destination(self, event):
         src = event.widget.get()

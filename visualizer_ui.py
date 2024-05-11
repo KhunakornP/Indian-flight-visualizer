@@ -166,6 +166,7 @@ class VisualizerUI(tk.Tk):
         frame2 = tk.Frame(mainframe)
         graph_label = tk.Label(frame1, text="Graph selector:")
         graph_select = ttk.Combobox(frame1,font=self.default_font)
+        graph_select["values"] = ["Stacked bar", "Scatter", "bar graph"]
         self.next_button = tk.Button(frame1, text="Next page")
         self.prev_button = tk.Button(frame1, text="Previous")
         self.comboboxes.append(graph_select)
